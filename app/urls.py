@@ -5,8 +5,9 @@ from django.urls import path, reverse_lazy
 from . import views
 
 urlpatterns = [
-    # Dashboard (Bosh sahifa)
-    path("", views.admin_dashboard, name="admin_dashboard"),
+    # Public home page and protected admin dashboard
+    path("", views.books, name="home"),
+    path("dashboard/", views.admin_dashboard, name="admin_dashboard"),
     # Kitoblar bo'limi
     path("books/", views.books, name="books_list"),
     path("books/create/", views.book_create, name="book_create"),
