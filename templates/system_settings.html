@@ -1,0 +1,72 @@
+{% extends 'base_admin.html' %}
+
+{% block title %}Tizim sozlamalari - Bookify Admin{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h3 class="fw-bold mb-1">Tizim sozlamalari</h3>
+    <p class="text-muted small mb-0">Admin panel va tizim haqida umumiy ma'lumotlar.</p>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-6">
+        <div class="dashboard-card">
+            <h6 class="fw-bold mb-3">Hisob ma'lumotlari</h6>
+            <table class="table table-borderless mb-0">
+                <tr>
+                    <td class="text-muted" style="width: 160px;">Foydalanuvchi nomi</td>
+                    <td class="fw-semibold">{{ user.username }}</td>
+                </tr>
+                <tr>
+                    <td class="text-muted">Email</td>
+                    <td class="fw-semibold">{{ user.email|default:"Kiritilmagan" }}</td>
+                </tr>
+                <tr>
+                    <td class="text-muted">Rol</td>
+                    <td class="fw-semibold">
+                        {% if user.is_superuser %}Superadmin{% elif user.is_staff %}Administrator{% else %}Foydalanuvchi{% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="text-muted">Ro'yxatdan o'tgan sana</td>
+                    <td class="fw-semibold">{{ user.date_joined|date:"d.m.Y" }}</td>
+                </tr>
+                <tr>
+                    <td class="text-muted">Oxirgi kirish</td>
+                    <td class="fw-semibold">{{ user.last_login|date:"d.m.Y H:i"|default:"—" }}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="dashboard-card">
+            <h6 class="fw-bold mb-3">Tizim statistikasi</h6>
+            <table class="table table-borderless mb-0">
+                <tr>
+                    <td class="text-muted" style="width: 160px;">Jami kitoblar</td>
+                    <td class="fw-semibold">{{ total_books }}</td>
+                </tr>
+                <tr>
+                    <td class="text-muted">Jami buyurtmalar</td>
+                    <td class="fw-semibold">{{ total_orders }}</td>
+                </tr>
+                <tr>
+                    <td class="text-muted">Jami sharhlar</td>
+                    <td class="fw-semibold">{{ total_reviews }}</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="dashboard-card">
+            <h6 class="fw-bold mb-3">Parolni o'zgartirish</h6>
+            <p class="text-muted small mb-3">
+                Xavfsizlik uchun parolingizni muntazam yangilab turing.
+            </p>
+            <a href="{% url 'password_change' %}" class="btn btn-outline-dark btn-sm rounded-3">
+                <i class="bi bi-key"></i> Parolni o'zgartirish
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

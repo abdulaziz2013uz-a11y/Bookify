@@ -1,0 +1,96 @@
+{% extends 'base_admin.html' %}
+
+{% block title %}Dashboard - Bookify Admin{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h3 class="fw-bold mb-1">Xush kelibsiz, {{ user.username|default:"Admin" }}! 👋</h3>
+    <p class="text-muted small mb-0">Tizimning umumiy ko'rsatkichlari va statistikasi.</p>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="dashboard-card text-center">
+            <i class="bi bi-journal-bookmark fs-1 text-primary mb-2 d-block"></i>
+            <h6 class="text-muted small">Jami Kitoblar</h6>
+            <h4 class="fw-bold mb-0">{{ total_books }}</h4>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="dashboard-card text-center">
+            <i class="bi bi-chat-left-text fs-1 text-success mb-2 d-block"></i>
+            <h6 class="text-muted small">Jami Sharhlar</h6>
+            <h4 class="fw-bold mb-0">{{ total_reviews }}</h4>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="dashboard-card text-center">
+            <i class="bi bi-cart-check fs-1 text-warning mb-2 d-block"></i>
+            <h6 class="text-muted small">Jami Buyurtmalar</h6>
+            <h4 class="fw-bold mb-0">{{ total_orders }}</h4>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="dashboard-card text-center">
+            <i class="bi bi-cash-stack fs-1 text-info mb-2 d-block"></i>
+            <h6 class="text-muted small">Kitoblar Umumiy Qiymati</h6>
+            <h4 class="fw-bold mb-0">{{ total_price|floatformat:0 }} so'm</h4>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-7">
+        <div class="dashboard-card h-100">
+            <h6 class="fw-bold mb-3">So'nggi qo'shilgan kitoblar</h6>
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nomi</th>
+                            <th>Muallif</th>
+                            <th>Narxi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for book in recent_books %}
+                        <tr>
+                            <td>#{{ book.id }}</td>
+                            <td>
+                                <a href="{% url 'book_detail' book.id %}" class="text-decoration-none fw-semibold">
+                                    {{ book.title }}
+                                </a>
+                            </td>
+                            <td>{{ book.author }}</td>
+                            <td class="fw-bold">{{ book.price }} so'm</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-3">Hozircha kitob yo'q</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-5">
+        <div class="dashboard-card h-100">
+            <h6 class="fw-bold mb-3">So'nggi buyurtmalar</h6>
+            {% for order in recent_orders %}
+            <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+                <div>
+                    <div class="fw-semibold fs-7">{{ order.full_name }}</div>
+                    <div class="text-muted small">{{ order.book.title }}</div>
+                </div>
+                <div class="fw-bold fs-7">{{ order.quantity }} dona</div>
+            </div>
+            {% empty %}
+            <p class="text-muted small mb-0">Buyurtmalar topilmadi</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

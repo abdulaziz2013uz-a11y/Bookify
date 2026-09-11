@@ -1,0 +1,41 @@
+{% extends 'base_admin.html' %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="mb-4">
+        <h3 class="fw-bold text-dark mb-1">Foydalanuvchilar sharhlari</h3>
+        <p class="text-muted mb-0">Kitoblarga qoldirilgan baho va fikrlar</p>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4">Mijoz</th>
+                            <th>Kitob</th>
+                            <th>Baho</th>
+                            <th>Sharh</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for review in reviews %}
+                        <tr>
+                            <td class="ps-4 fw-semibold">{{ review.name }}</td>
+                            <td>{{ review.book.title }}</td>
+                            <td><span class="text-warning">★ {{ review.rating }}</span>/5</td>
+                            <td>{{ review.comment }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center py-4 text-muted">Hali hech qanday sharh qoldirilmagan.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

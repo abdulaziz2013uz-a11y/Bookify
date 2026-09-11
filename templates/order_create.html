@@ -1,0 +1,349 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buyurtma berish - {{ book.title }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --accent: #10b981;
+            --accent-dark: #059669;
+            --ink: #0f172a;
+            --muted: #64748b;
+        }
+
+        * { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+
+        body {
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at 10% 10%, rgba(16, 185, 129, 0.18), transparent 40%),
+                radial-gradient(circle at 90% 90%, rgba(59, 130, 246, 0.15), transparent 45%),
+                linear-gradient(160deg, #0b1220 0%, #111827 50%, #0b1220 100%);
+            background-attachment: fixed;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem 1rem;
+        }
+
+        .order-wrapper {
+            width: 100%;
+            max-width: 620px;
+        }
+
+        .brand-header {
+            text-align: center;
+            margin-bottom: 1.75rem;
+        }
+
+        .brand-header .icon-circle {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: #fff;
+            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.35);
+            margin-bottom: 0.75rem;
+        }
+
+        .brand-header h1 {
+            color: #fff;
+            font-weight: 800;
+            font-size: 1.75rem;
+            margin: 0;
+        }
+
+        .brand-header p {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+
+        .order-card {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 24px;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+            overflow: hidden;
+        }
+
+        .book-strip {
+            background: linear-gradient(135deg, #ecfdf5, #f0fdfa);
+            padding: 1.5rem 1.75rem;
+            border-bottom: 1px solid #e2f4ec;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .book-strip .cover-fallback {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            color: var(--accent-dark);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            flex-shrink: 0;
+        }
+
+        .book-strip img {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            object-fit: cover;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .book-strip h5 {
+            font-weight: 700;
+            margin: 0;
+            color: var(--ink);
+            font-size: 1.05rem;
+        }
+
+        .book-strip .author {
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+
+        .book-strip .price {
+            margin-left: auto;
+            text-align: right;
+            font-weight: 800;
+            color: var(--accent-dark);
+            font-size: 1.1rem;
+            white-space: nowrap;
+        }
+
+        .order-form {
+            padding: 2rem 1.75rem;
+        }
+
+        .field-group {
+            position: relative;
+            margin-bottom: 1.25rem;
+        }
+
+        .field-group label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--ink);
+            margin-bottom: 0.4rem;
+            display: block;
+        }
+
+        .field-group .input-icon-wrap {
+            position: relative;
+        }
+
+        .field-group .input-icon-wrap i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #a3aebc;
+            font-size: 1rem;
+        }
+
+        .field-group input {
+            width: 100%;
+            padding: 0.75rem 0.9rem 0.75rem 2.6rem;
+            border: 1.5px solid #e5e9f0;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+            background: #f8fafc;
+        }
+
+        .field-group input:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.12);
+        }
+
+        .qty-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .qty-row input {
+            text-align: center;
+            padding-left: 0.9rem;
+        }
+
+        .qty-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            border: 1.5px solid #e5e9f0;
+            background: #f8fafc;
+            color: var(--ink);
+            font-weight: 700;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+            transition: all 0.15s ease;
+        }
+
+        .qty-btn:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+        }
+
+        .action-row {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1.75rem;
+        }
+
+        .btn-confirm {
+            flex: 1;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: #fff;
+            border: none;
+            border-radius: 14px;
+            padding: 0.85rem 1rem;
+            font-weight: 700;
+            font-size: 0.95rem;
+            box-shadow: 0 10px 24px rgba(16, 185, 129, 0.3);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .btn-confirm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 28px rgba(16, 185, 129, 0.4);
+            color: #fff;
+        }
+
+        .btn-back {
+            border-radius: 14px;
+            padding: 0.85rem 1.25rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--muted);
+            background: #f1f5f9;
+            border: none;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: background 0.15s ease;
+        }
+
+        .btn-back:hover {
+            background: #e2e8f0;
+            color: var(--ink);
+        }
+
+        .trust-note {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #94a3b8;
+            font-size: 0.78rem;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="order-wrapper">
+        <div class="brand-header">
+            <div class="icon-circle"><i class="bi bi-bag-check-fill"></i></div>
+            <h1>Buyurtma berish</h1>
+            <p>Ma'lumotlarni to'ldiring, tez orada siz bilan bog'lanamiz</p>
+        </div>
+
+        <div class="order-card">
+            <div class="book-strip">
+                {% if book.image %}
+                    <img src="{{ book.image.url }}" alt="{{ book.title }}">
+                {% else %}
+                    <div class="cover-fallback"><i class="bi bi-journal-bookmark"></i></div>
+                {% endif %}
+                <div>
+                    <h5>{{ book.title }}</h5>
+                    <div class="author">{{ book.author }}</div>
+                </div>
+                <div class="price">{{ book.price }} so'm</div>
+            </div>
+
+            <div class="order-form">
+                <form method="POST">
+                    {% csrf_token %}
+
+                    <div class="field-group">
+                        <label for="id_full_name">To'liq ism</label>
+                        <div class="input-icon-wrap">
+                            <i class="bi bi-person"></i>
+                            <input type="text" name="full_name" id="id_full_name" placeholder="Ismingiz va familiyangiz" required>
+                        </div>
+                    </div>
+
+                    <div class="field-group">
+                        <label for="id_phone">Telefon raqam</label>
+                        <div class="input-icon-wrap">
+                            <i class="bi bi-telephone"></i>
+                            <input type="tel" name="phone" id="id_phone" placeholder="+998 90 123 45 67" required>
+                        </div>
+                    </div>
+
+                    <div class="field-group">
+                        <label for="id_address">Manzil</label>
+                        <div class="input-icon-wrap">
+                            <i class="bi bi-geo-alt"></i>
+                            <input type="text" name="address" id="id_address" placeholder="Shahar, tuman, ko'cha" required>
+                        </div>
+                    </div>
+
+                    <div class="field-group">
+                        <label for="id_quantity">Nechta dona</label>
+                        <div class="qty-row">
+                            <button type="button" class="qty-btn" onclick="stepQty(-1)">−</button>
+                            <input type="number" name="quantity" id="id_quantity" value="1" min="1" required>
+                            <button type="button" class="qty-btn" onclick="stepQty(1)">+</button>
+                        </div>
+                    </div>
+
+                    <div class="action-row">
+                        <button type="submit" class="btn-confirm">
+                            <i class="bi bi-check-lg"></i> Buyurtmani tasdiqlash
+                        </button>
+                        <a href="{% url 'book_detail' book.id %}" class="btn-back">
+                            <i class="bi bi-arrow-left"></i> Orqaga
+                        </a>
+                    </div>
+                </form>
+
+                <div class="trust-note">
+                    <i class="bi bi-shield-check"></i> Ma'lumotlaringiz faqat buyurtmani bog'lanish uchun ishlatiladi
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function stepQty(delta) {
+            const input = document.getElementById('id_quantity');
+            const next = Math.max(1, (parseInt(input.value) || 1) + delta);
+            input.value = next;
+        }
+    </script>
+</body>
+</html>

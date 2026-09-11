@@ -1,0 +1,71 @@
+{% extends 'base_public.html' %}
+
+{% block title %}Kitoblar - Bookify{% endblock %}
+
+{% block content %}
+<!-- Hero -->
+<div class="container pt-5 pb-4 text-center">
+    <h1 class="fw-bold display-6 mb-2">Sevimli kitobingizni toping</h1>
+    <p class="text-muted mb-0">Jami {{ total_count }} ta kitob mavjud — o'zingizga yoqqanini tanlang</p>
+</div>
+
+<div class="container mb-4 d-md-none">
+    <form method="GET" action="{% url 'books_list' %}">
+        <div class="input-group">
+            <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+            <input type="text" name="q" class="form-control border-start-0" placeholder="Kitob qidirish..." value="{{ query|default:'' }}">
+        </div>
+    </form>
+</div>
+
+<div class="container mb-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <div class="text-muted small">
+        {% if query %}"{{ query }}" bo'yicha {{ books|length }} ta natija{% else %}Barcha kitoblar{% endif %}
+    </div>
+    <form method="GET" action="{% url 'books_list' %}" class="d-flex gap-2">
+        {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
+        <select name="sort" class="form-select form-select-sm" onchange="this.form.submit()" style="width: auto;">
+            <option value="">Saralash</option>
+            <option value="price_asc" {% if sort == "price_asc" %}selected{% endif %}>Narx (arzon)</option>
+            <option value="price_desc" {% if sort == "price_desc" %}selected{% endif %}>Narx (qimmat)</option>
+            <option value="title" {% if sort == "title" %}selected{% endif %}>Nomi (A-Z)</option>
+        </select>
+    </form>
+</div>
+
+<div class="container pb-5">
+    <div class="row g-4">
+        {% for book in books %}
+        <div class="col-6 col-md-4 col-lg-3">
+            <div class="book-card">
+                <a href="{% url 'book_detail' book.id %}" class="text-decoration-none text-reset">
+                    <div class="cover">
+                        {% if book.image %}
+                            <img src="{{ book.image.url }}" alt="{{ book.title }}">
+                        {% else %}
+                            <i class="bi bi-journal-bookmark"></i>
+                        {% endif %}
+                    </div>
+                </a>
+                <div class="body">
+                    {% if book.genre %}<span class="genre-tag">{{ book.genre }}</span>{% endif %}
+                    <h6>
+                        <a href="{% url 'book_detail' book.id %}" class="text-decoration-none text-reset">{{ book.title }}</a>
+                    </h6>
+                    <div class="author">{{ book.author|default:"Noma'lum muallif" }}</div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="price">{{ book.price }} so'm</span>
+                        <a href="{% url 'book_detail' book.id %}" class="btn-accent">Ko'rish</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <i class="bi bi-inbox fs-1 text-muted d-block mb-2"></i>
+            <p class="text-muted">Hozircha kitob topilmadi.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

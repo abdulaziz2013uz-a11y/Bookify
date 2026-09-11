@@ -1,0 +1,118 @@
+{% extends 'base_admin.html' %}
+
+{% block title %}Kitoblar - Bookify Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-1">Kitoblar ro'yxati</h3>
+        <p class="text-muted small mb-0">Barcha kitoblarni boshqarish, qidirish va tahrirlash.</p>
+    </div>
+    {% if user.is_staff %}
+    <div class="d-flex gap-2">
+        <a href="{% url 'books_import' %}" class="btn btn-outline-secondary rounded-3 btn-sm">
+            <i class="bi bi-upload"></i> CSV Import
+        </a>
+        <a href="{% url 'book_create' %}" class="btn btn-dark rounded-3 btn-sm">
+            <i class="bi bi-plus-lg"></i> Kitob qo'shish
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- KPI Summary Row -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="kpi-card">
+            <div class="kpi-title">Jami Kitoblar</div>
+            <div class="kpi-value">{{ total_count|default:"0" }}</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="kpi-card">
+            <div class="kpi-title">Umumiy Qiymat</div>
+            <div class="kpi-value">{{ total_price|default:"0" }} so'm</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="kpi-card">
+            <div class="kpi-title">O'rtacha Narx</div>
+            <div class="kpi-value">{{ avg_price|floatformat:0|default:"0" }} so'm</div>
+        </div>
+    </div>
+</div>
+
+<!-- Sort / Filter row -->
+<div class="dashboard-card mb-0">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h6 class="fw-bold mb-0">
+            Mavjud Kitoblar
+            <span class="badge bg-light text-dark fw-normal ms-2">Jami: {{ books|length }} ta</span>
+        </h6>
+        <form method="GET" action="{% url 'books_list' %}" class="d-flex gap-2">
+            {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
+            <select name="sort" class="form-select form-select-sm" onchange="this.form.submit()">
+                <option value="">Saralash</option>
+                <option value="price_asc" {% if sort == "price_asc" %}selected{% endif %}>Narx (o'sish)</option>
+                <option value="price_desc" {% if sort == "price_desc" %}selected{% endif %}>Narx (kamayish)</option>
+                <option value="title" {% if sort == "title" %}selected{% endif %}>Nomi (A-Z)</option>
+            </select>
+        </form>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-custom align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>KITOB NOMI</th>
+                    <th>MUALLIF</th>
+                    <th>NARXI</th>
+                    <th>HARAKATLAR</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for book in books %}
+                <tr>
+                    <td>#{{ book.id }}</td>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            {% if book.image %}
+                                <img src="{{ book.image.url }}" class="rounded" style="width: 32px; height: 32px; object-fit: cover;">
+                            {% else %}
+                                <i class="bi bi-book text-muted fs-5"></i>
+                            {% endif %}
+                            <span class="fw-semibold">{{ book.title }}</span>
+                        </div>
+                    </td>
+                    <td>{{ book.author|default:"Kiritilmagan" }}</td>
+                    <td class="fw-bold">{{ book.price }} so'm</td>
+                    <td>
+                        <div class="d-flex gap-1">
+                            <a href="{% url 'book_detail' book.id %}" class="btn btn-sm btn-light rounded-circle" title="Ko'rish">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            {% if user.is_staff %}
+                            <a href="{% url 'books_update' book.id %}" class="btn btn-sm btn-light text-primary rounded-circle" title="Tahrirlash">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a href="{% url 'book_delete' book.id %}" class="btn btn-sm btn-light text-danger rounded-circle" title="O'chirish">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center py-4 text-muted">
+                        <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+                        Hozircha hech qanday kitob topilmadi.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
