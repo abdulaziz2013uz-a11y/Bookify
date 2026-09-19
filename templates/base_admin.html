@@ -91,8 +91,10 @@
 
         .main-wrapper {
             margin-left: 260px;
+            width: calc(100% - 260px);
             padding: 1.5rem 2rem;
             min-width: 0;
+            overflow-x: hidden;
         }
 
         .top-navbar {
@@ -130,6 +132,14 @@
             padding: 1.5rem;
             margin-bottom: 1.5rem;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+        }
+
+        .main-wrapper .row {
+            max-width: 100%;
+        }
+
+        .main-wrapper .row > [class*="col-"] {
+            min-width: 0;
         }
 
         .admin-identity {
@@ -175,6 +185,7 @@
 
             .main-wrapper {
                 margin-left: 76px;
+                width: calc(100% - 76px);
                 padding: 1rem;
             }
 
