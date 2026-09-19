@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="mb-4">
-    <h3 class="fw-bold mb-1">Xush kelibsiz, {{ user.username|default:"Admin" }}! 👋</h3>
+    <h3 class="fw-bold mb-1">Xush kelibsiz, {{ user.get_full_name|default:user.username|default:"Admin" }}! 👋</h3>
     <p class="text-muted small mb-0">Tizimning umumiy ko'rsatkichlari va statistikasi.</p>
 </div>
 
