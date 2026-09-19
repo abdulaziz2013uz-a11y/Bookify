@@ -10,31 +10,31 @@
 
 <div class="row g-3 mb-4">
     <div class="col-md-3">
-        <div class="dashboard-card text-center">
-            <i class="bi bi-journal-bookmark fs-1 text-primary mb-2 d-block"></i>
-            <h6 class="text-muted small">Jami Kitoblar</h6>
-            <h4 class="fw-bold mb-0">{{ total_books }}</h4>
+        <div class="dashboard-card stat-card text-center">
+            <div class="stat-icon stat-icon-blue"><i class="bi bi-journal-bookmark"></i></div>
+            <div class="stat-label">Jami kitoblar</div>
+            <div class="stat-value">{{ total_books }}</div>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="dashboard-card text-center">
-            <i class="bi bi-chat-left-text fs-1 text-success mb-2 d-block"></i>
-            <h6 class="text-muted small">Jami Sharhlar</h6>
-            <h4 class="fw-bold mb-0">{{ total_reviews }}</h4>
+        <div class="dashboard-card stat-card text-center">
+            <div class="stat-icon stat-icon-green"><i class="bi bi-chat-left-text"></i></div>
+            <div class="stat-label">Jami sharhlar</div>
+            <div class="stat-value">{{ total_reviews }}</div>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="dashboard-card text-center">
-            <i class="bi bi-cart-check fs-1 text-warning mb-2 d-block"></i>
-            <h6 class="text-muted small">Jami Buyurtmalar</h6>
-            <h4 class="fw-bold mb-0">{{ total_orders }}</h4>
+        <div class="dashboard-card stat-card text-center">
+            <div class="stat-icon stat-icon-yellow"><i class="bi bi-cart-check"></i></div>
+            <div class="stat-label">Jami buyurtmalar</div>
+            <div class="stat-value">{{ total_orders }}</div>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="dashboard-card text-center">
-            <i class="bi bi-cash-stack fs-1 text-info mb-2 d-block"></i>
-            <h6 class="text-muted small">Kitoblar Umumiy Qiymati</h6>
-            <h4 class="fw-bold mb-0">{{ total_price|floatformat:0 }} so'm</h4>
+        <div class="dashboard-card stat-card text-center">
+            <div class="stat-icon stat-icon-cyan"><i class="bi bi-cash-stack"></i></div>
+            <div class="stat-label">Kitoblar umumiy qiymati</div>
+            <div class="stat-value">{{ total_price|floatformat:0 }} so'm</div>
         </div>
     </div>
 </div>
@@ -42,9 +42,9 @@
 <div class="row g-3">
     <div class="col-lg-7">
         <div class="dashboard-card h-100">
-            <h6 class="fw-bold mb-3">So'nggi qo'shilgan kitoblar</h6>
+            <h6 class="dashboard-section-title mb-3">So'nggi qo'shilgan kitoblar</h6>
             <div class="table-responsive">
-                <table class="table align-middle mb-0">
+                <table class="table dashboard-table align-middle mb-0">
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -78,14 +78,14 @@
 
     <div class="col-lg-5">
         <div class="dashboard-card h-100">
-            <h6 class="fw-bold mb-3">So'nggi buyurtmalar</h6>
+            <h6 class="dashboard-section-title mb-3">So'nggi buyurtmalar</h6>
             {% for order in recent_orders %}
-            <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+            <div class="order-item d-flex justify-content-between align-items-center border-bottom">
                 <div>
                     <div class="fw-semibold fs-7">{{ order.full_name }}</div>
                     <div class="text-muted small">{{ order.book.title }}</div>
                 </div>
-                <div class="fw-bold fs-7">{{ order.quantity }} dona</div>
+                <div class="order-quantity fw-bold">{{ order.quantity }} dona</div>
             </div>
             {% empty %}
             <p class="text-muted small mb-0">Buyurtmalar topilmadi</p>
