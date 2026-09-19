@@ -2,16 +2,179 @@
 
 {% block title %}{{ book.title }} - Bookify{% endblock %}
 
+{% block extra_css %}
+<style>
+    .detail-page {
+        padding: 3rem 0 1rem;
+    }
+
+    .back-link {
+        color: var(--text-muted);
+        transition: color 0.2s ease;
+    }
+
+    .back-link:hover {
+        color: var(--text-main);
+    }
+
+    .detail-card,
+    .reviews-card {
+        background: var(--surface-dark);
+        border: 1px solid var(--border-color);
+        border-radius: 18px;
+        box-shadow: 0 18px 45px rgba(0, 0, 0, 0.18);
+    }
+
+    .detail-card {
+        padding: 1rem;
+    }
+
+    .detail-cover {
+        height: 520px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        background: #0f172a;
+    }
+
+    .detail-cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    .detail-info {
+        height: 100%;
+        padding: 0.75rem 0.25rem 0.75rem 1rem;
+    }
+
+    .genre-tag {
+        display: inline-flex;
+        padding: 0.35rem 0.7rem;
+        border-radius: 999px;
+        background: rgba(139, 92, 246, 0.15);
+        border: 1px solid rgba(139, 92, 246, 0.25);
+        color: #c4b5fd;
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
+
+    .book-price {
+        color: #c4b5fd;
+        font-size: clamp(1.5rem, 3vw, 2.15rem);
+        font-weight: 800;
+    }
+
+    .book-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem 1.5rem;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
+
+    .description {
+        color: #d1d5db;
+        line-height: 1.75;
+    }
+
+    .btn-accent {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.8rem 1.35rem;
+        border: 0;
+        border-radius: 10px;
+        background: var(--accent-gradient);
+        color: #fff;
+        font-weight: 700;
+        text-decoration: none;
+        transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+
+    .btn-accent:hover {
+        color: #fff;
+        opacity: 0.92;
+        transform: translateY(-2px);
+    }
+
+    .reviews-card {
+        padding: 1.5rem;
+    }
+
+    .review-item {
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .review-form .form-control,
+    .review-form .form-select {
+        min-height: 48px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid var(--border-color);
+        color: var(--text-main);
+    }
+
+    .review-form textarea.form-control {
+        min-height: 110px;
+    }
+
+    .review-form .form-control::placeholder {
+        color: #94a3b8;
+    }
+
+    .review-form .form-control:focus,
+    .review-form .form-select:focus {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+        color: #fff;
+    }
+
+    .review-form .form-select option {
+        background: #121826;
+        color: #fff;
+    }
+
+    @media (max-width: 991.98px) {
+        .detail-info {
+            padding: 1rem 0.25rem 0;
+        }
+    }
+
+    @media (max-width: 575.98px) {
+        .detail-page {
+            padding-top: 1.5rem;
+        }
+
+        .detail-cover {
+            height: 390px;
+        }
+
+        .detail-card,
+        .reviews-card {
+            border-radius: 14px;
+        }
+
+        .reviews-card {
+            padding: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container py-5">
-    <a href="{% url 'books_list' %}" class="text-decoration-none text-muted small d-inline-flex align-items-center gap-1 mb-4">
+<div class="container detail-page">
+    <a href="{% url 'books_list' %}" class="back-link text-decoration-none small d-inline-flex align-items-center gap-1 mb-4">
         <i class="bi bi-arrow-left"></i> Kitoblarga qaytish
     </a>
 
-    <div class="row g-5">
+    <div class="row g-4 g-xl-5 align-items-stretch">
         <div class="col-lg-5">
-            <div class="book-card">
-                <div class="cover" style="height: 400px;">
+            <div class="detail-card h-100">
+                <div class="detail-cover">
                     {% if book.image %}
                         <img src="{{ book.image.url }}" alt="{{ book.title }}">
                     {% else %}
@@ -22,45 +185,47 @@
         </div>
 
         <div class="col-lg-7">
-            {% if book.genre %}<span class="genre-tag mb-2">{{ book.genre }}</span>{% endif %}
-            <h1 class="fw-bold mt-2">{{ book.title }}</h1>
-            <p class="text-muted mb-3">Muallif: <strong>{{ book.author|default:"Noma'lum" }}</strong></p>
+            <div class="detail-info d-flex flex-column">
+                {% if book.genre %}<span class="genre-tag align-self-start mb-3">{{ book.genre }}</span>{% endif %}
+                <h1 class="fw-bold mt-0 mb-2">{{ book.title }}</h1>
+                <p class="text-muted mb-4">Muallif: <strong class="text-light">{{ book.author|default:"Noma'lum" }}</strong></p>
 
-            <div class="d-flex align-items-center gap-3 mb-4">
-                <span class="fs-3 fw-bold" style="color: var(--accent-dark);">{{ book.price }} so'm</span>
+                <div class="d-flex align-items-center flex-wrap gap-3 mb-4">
+                <span class="book-price">{{ book.price }} so'm</span>
                 {% if avg_rating %}
                 <span class="text-warning">★ {{ avg_rating|floatformat:1 }}</span>
                 <span class="text-muted small">({{ reviews_count }} sharh)</span>
                 {% endif %}
-            </div>
+                </div>
 
-            <div class="d-flex gap-4 mb-4 text-muted small">
+            <div class="book-meta mb-4">
                 <div><i class="bi bi-file-earmark-text"></i> {{ book.pages_count|default:"0" }} bet</div>
                 <div><i class="bi bi-calendar3"></i> {{ book.published_date|date:"Y" }}</div>
             </div>
 
-            <p class="mb-4" style="line-height: 1.7;">
+            <div class="description mb-4">
                 {% if book.description %}
                     {{ book.description|linebreaks }}
                 {% else %}
                     Ushbu kitob uchun hali tavsif kiritilmagan.
                 {% endif %}
-            </p>
+            </div>
 
-            <a href="{% url 'order_create' book.id %}" class="btn-accent" style="padding: 0.8rem 2rem; font-size: 1rem; border-radius: 12px;">
+            <a href="{% url 'order_create' book.id %}" class="btn-accent mt-auto align-self-start">
                 <i class="bi bi-bag-check"></i> Buyurtma berish
             </a>
+            </div>
         </div>
     </div>
 
     <!-- Reviews -->
-    <div class="row mt-5">
+    <div class="row mt-5 mb-2">
         <div class="col-lg-8">
-            <div class="book-card p-4">
+            <div class="reviews-card">
                 <h5 class="fw-bold mb-3">Sharhlar ({{ reviews_count }})</h5>
 
                 {% for review in reviews %}
-                <div class="border-bottom py-3">
+                <div class="review-item py-3">
                     <div class="d-flex justify-content-between">
                         <span class="fw-semibold">{{ review.name }}</span>
                         <span class="text-warning">★ {{ review.rating }}</span>
@@ -71,7 +236,7 @@
                 <p class="text-muted small mb-0">Hali sharhlar yo'q. Birinchi bo'lib fikr bildiring!</p>
                 {% endfor %}
 
-                <form method="POST" class="mt-4">
+                <form method="POST" class="review-form mt-4">
                     {% csrf_token %}
                     <div class="row g-2">
                         <div class="col-md-5">
