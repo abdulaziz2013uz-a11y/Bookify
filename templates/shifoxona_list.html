@@ -1,0 +1,69 @@
+{% extends 'base_admin.html' %}
+
+{% block title %}Shifoxonalar{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-1">Shifoxonalar ro'yxati</h3>
+        <p class="text-muted small mb-0">Shifoxonalarni ko'rish va boshqarish.</p>
+    </div>
+    {% if user.is_staff %}
+        <a href="{% url 'create_shifoxona' %}" class="btn btn-primary">
+            <i class="bi bi-plus-lg"></i> Shifoxona qo'shish
+        </a>
+    {% endif %}
+</div>
+
+<div class="dashboard-card">
+    <div class="table-responsive">
+        <table class="table table-custom align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>NOMI</th>
+                    <th>MANZILI</th>
+                    <th>XONALAR</th>
+                    <th>SHIFOKORLAR</th>
+                    <th>HOLATI</th>
+                    <th>HARAKATLAR</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for shifoxona in shifoxonalar %}
+                <tr>
+                    <td>#{{ shifoxona.id }}</td>
+                    <td class="fw-semibold">{{ shifoxona.nomi }}</td>
+                    <td>{{ shifoxona.manzili }}</td>
+                    <td>{{ shifoxona.xona_soni }}</td>
+                    <td>{{ shifoxona.shifokor_soni }}</td>
+                    <td>
+                        {% if shifoxona.ochiqmi %}
+                            <span class="badge bg-success">Ochiq</span>
+                        {% else %}
+                            <span class="badge bg-secondary">Yopiq</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="d-flex gap-1">
+                            <a href="{% url 'shifoxona_detail' shifoxona.pk %}" class="btn btn-sm btn-light rounded-circle" title="Ko'rish">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            {% if user.is_staff %}
+                                <a href="{% url 'update_shifoxona' shifoxona.pk %}" class="btn btn-sm btn-light text-primary rounded-circle" title="Tahrirlash">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center py-4 text-muted">Hozircha shifoxona qo'shilmagan.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

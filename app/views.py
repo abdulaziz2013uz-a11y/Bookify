@@ -6,11 +6,49 @@ from django.contrib.auth.models import User
 from django.db.models import Avg, Count, Sum
 from django.shortcuts import get_object_or_404, redirect, render
 
-from .models import Book, Order, Review
+from .forms import ShifoxonaForm
+from .models import Book, Order, Review, Shifoxona
 
 
 def is_admin(user):
     return user.is_staff
+
+
+def shifoxona_list(request):
+    shifoxonalar = Shifoxona.objects.all().order_by("-id")
+    return render(request, "shifoxona_list.html", {"shifoxonalar": shifoxonalar})
+
+
+@user_passes_test(is_admin, login_url="/login/")
+def create_shifoxona(request):
+    form = ShifoxonaForm(request.POST or None)
+    if form.is_valid():
+        shifoxona = form.save()
+        return redirect("shifoxona_detail", pk=shifoxona.pk)
+    return render(request, "shifoxona_form.html", {"form": form, "title": "Shifoxona qo'shish"})
+
+
+def shifoxona_detail(request, pk):
+    shifoxona = get_object_or_404(Shifoxona, pk=pk)
+    return render(request, "shifoxona_detail.html", {"shifoxona": shifoxona})
+
+
+@user_passes_test(is_admin, login_url="/login/")
+def update_shifoxona(request, pk):
+    shifoxona = get_object_or_404(Shifoxona, pk=pk)
+    form = ShifoxonaForm(request.POST or None, instance=shifoxona)
+    if form.is_valid():
+        form.save()
+        return redirect("shifoxona_detail", pk=shifoxona.pk)
+    return render(request, "shifoxona_form.html", {"form": form, "title": "Shifoxonani tahrirlash"})
+
+
+@user_passes_test(is_admin, login_url="/login/")
+def delete_shifoxona(request, pk):
+    shifoxona = get_object_or_404(Shifoxona, pk=pk)
+    if request.method == "POST":
+        shifoxona.delete()
+    return redirect("shifoxona_list")
 
 
 # ==========================================

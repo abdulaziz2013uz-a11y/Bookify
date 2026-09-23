@@ -1,0 +1,43 @@
+{% extends 'base_admin.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <a href="{% url 'shifoxona_list' %}" class="text-decoration-none text-muted small">
+        <i class="bi bi-arrow-left"></i> Shifoxonalar ro'yxatiga qaytish
+    </a>
+    <h3 class="fw-bold mb-0 mt-1">{{ title }}</h3>
+</div>
+
+<div class="dashboard-card col-lg-8">
+    <form method="post" novalidate>
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        {% for field in form %}
+            <div class="mb-3">
+                {% if field.field.widget.input_type == 'checkbox' %}
+                    <div class="form-check">
+                        {{ field }}
+                        <label class="form-check-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    </div>
+                {% else %}
+                    <label class="form-label fw-semibold" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                {% endif %}
+                {% for error in field.errors %}
+                    <div class="text-danger small mt-1">{{ error }}</div>
+                {% endfor %}
+            </div>
+        {% endfor %}
+
+        <div class="d-flex justify-content-end gap-2">
+            <a href="{% url 'shifoxona_list' %}" class="btn btn-light">Bekor qilish</a>
+            <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> Saqlash</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

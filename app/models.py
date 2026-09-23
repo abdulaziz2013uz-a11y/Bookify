@@ -2,6 +2,26 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 
+class Shifoxona(models.Model):
+    nomi = models.CharField(max_length=155)
+    manzili = models.CharField(max_length=200)
+    xona_soni = models.PositiveIntegerField()
+    shifokor_soni = models.IntegerField()
+    bahosi = models.FloatField()
+    kunlik_narxi = models.DecimalField(max_digits=5, decimal_places=2)
+    ochiqmi = models.BooleanField(default=False)
+    emaili = models.EmailField()
+    ochilgan_sana = models.DateField()
+    yaratilgan_vaqt = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Shifoxona"
+        verbose_name_plural = "Shifoxonalar"
+
+    def __str__(self):
+        return self.nomi
+
+
 class Car(models.Model):
     name = models.CharField(max_length=255, verbose_name="Nomi")
     price = models.DecimalField(

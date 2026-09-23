@@ -1,0 +1,48 @@
+{% extends 'base_admin.html' %}
+
+{% block title %}{{ shifoxona.nomi }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <a href="{% url 'shifoxona_list' %}" class="text-decoration-none text-muted small">
+            <i class="bi bi-arrow-left"></i> Ro'yxatga qaytish
+        </a>
+        <h3 class="fw-bold mb-0 mt-1">{{ shifoxona.nomi }}</h3>
+    </div>
+    {% if user.is_staff %}
+        <a href="{% url 'update_shifoxona' shifoxona.pk %}" class="btn btn-primary">
+            <i class="bi bi-pencil"></i> Tahrirlash
+        </a>
+    {% endif %}
+</div>
+
+<div class="dashboard-card col-lg-8">
+    <dl class="row mb-0">
+        <dt class="col-sm-5">Manzili</dt>
+        <dd class="col-sm-7">{{ shifoxona.manzili }}</dd>
+        <dt class="col-sm-5">Xonalar soni</dt>
+        <dd class="col-sm-7">{{ shifoxona.xona_soni }}</dd>
+        <dt class="col-sm-5">Shifokorlar soni</dt>
+        <dd class="col-sm-7">{{ shifoxona.shifokor_soni }}</dd>
+        <dt class="col-sm-5">Bahosi</dt>
+        <dd class="col-sm-7">{{ shifoxona.bahosi }}</dd>
+        <dt class="col-sm-5">Kunlik narxi</dt>
+        <dd class="col-sm-7">{{ shifoxona.kunlik_narxi }}</dd>
+        <dt class="col-sm-5">Emaili</dt>
+        <dd class="col-sm-7">{{ shifoxona.emaili }}</dd>
+        <dt class="col-sm-5">Ochilgan sana</dt>
+        <dd class="col-sm-7">{{ shifoxona.ochilgan_sana }}</dd>
+        <dt class="col-sm-5">Holati</dt>
+        <dd class="col-sm-7">{% if shifoxona.ochiqmi %}Ochiq{% else %}Yopiq{% endif %}</dd>
+    </dl>
+
+    {% if user.is_staff %}
+        <hr>
+        <form method="post" action="{% url 'delete_shifoxona' shifoxona.pk %}" onsubmit="return confirm('Shifoxonani o\'chirishni tasdiqlaysizmi?');">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i> O'chirish</button>
+        </form>
+    {% endif %}
+</div>
+{% endblock %}

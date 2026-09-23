@@ -7,6 +7,11 @@ from . import views
 urlpatterns = [
     # Public home page and protected admin dashboard
     path("", views.books, name="home"),
+    path("shifoxonalar/", views.shifoxona_list, name="shifoxona_list"),
+    path("shifoxonalar/create/", views.create_shifoxona, name="create_shifoxona"),
+    path("shifoxonalar/<int:pk>/", views.shifoxona_detail, name="shifoxona_detail"),
+    path("shifoxonalar/<int:pk>/edit/", views.update_shifoxona, name="update_shifoxona"),
+    path("shifoxonalar/<int:pk>/delete/", views.delete_shifoxona, name="delete_shifoxona"),
     path("dashboard/", views.admin_dashboard, name="admin_dashboard"),
     # Kitoblar bo'limi
     path("books/", views.books, name="books_list"),
