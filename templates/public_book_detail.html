@@ -109,6 +109,11 @@
         border-bottom: 1px solid var(--border-color);
     }
 
+    .review-item .review-text {
+        color: #e5e7eb;
+        line-height: 1.6;
+    }
+
     .review-form .form-control,
     .review-form .form-select {
         min-height: 48px;
@@ -188,13 +193,13 @@
             <div class="detail-info d-flex flex-column">
                 {% if book.genre %}<span class="genre-tag align-self-start mb-3">{{ book.genre }}</span>{% endif %}
                 <h1 class="fw-bold mt-0 mb-2">{{ book.title }}</h1>
-                <p class="text-muted mb-4">Muallif: <strong class="text-light">{{ book.author|default:"Noma'lum" }}</strong></p>
+                <p class="text-subtle mb-4">Muallif: <strong class="text-soft">{{ book.author|default:"Noma'lum" }}</strong></p>
 
                 <div class="d-flex align-items-center flex-wrap gap-3 mb-4">
                 <span class="book-price">{{ book.price }} so'm</span>
                 {% if avg_rating %}
                 <span class="text-warning">★ {{ avg_rating|floatformat:1 }}</span>
-                <span class="text-muted small">({{ reviews_count }} sharh)</span>
+                <span class="text-subtle small">({{ reviews_count }} sharh)</span>
                 {% endif %}
                 </div>
 
@@ -230,7 +235,7 @@
                         <span class="fw-semibold">{{ review.name }}</span>
                         <span class="text-warning">★ {{ review.rating }}</span>
                     </div>
-                    <p class="text-muted small mb-0 mt-1">{{ review.comment }}</p>
+                    <p class="review-text small mb-0 mt-1">{{ review.comment }}</p>
                 </div>
                 {% empty %}
                 <p class="text-muted small mb-0">Hali sharhlar yo'q. Birinchi bo'lib fikr bildiring!</p>
