@@ -157,6 +157,115 @@
             border-top: 1px solid var(--border-color);
             padding-top: 1.25rem;
         }
+
+        .bookify-chat-launcher {
+            position: fixed;
+            right: 1.5rem;
+            bottom: 1.5rem;
+            z-index: 1000;
+            border: 0;
+            border-radius: 999px;
+            padding: 0.85rem 1.2rem;
+            color: #fff;
+            background: var(--accent-gradient);
+            box-shadow: 0 8px 28px rgba(124, 58, 237, 0.35);
+            font-weight: 700;
+        }
+
+        .bookify-chat-panel {
+            position: fixed;
+            right: 1.5rem;
+            bottom: 5.5rem;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            width: min(390px, calc(100vw - 2rem));
+            height: min(540px, calc(100dvh - 7rem));
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 20px;
+            background: #101522;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+        }
+
+        .bookify-chat-panel[hidden] { display: none; }
+
+        .bookify-chat-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .bookify-chat-header button {
+            color: var(--text-subtle);
+            border: 1px solid var(--border-color);
+            border-radius: 9px;
+            background: transparent;
+        }
+
+        .bookify-chat-messages {
+            display: flex;
+            flex: 1;
+            flex-direction: column;
+            gap: 0.75rem;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        .bookify-chat-message {
+            max-width: 90%;
+            padding: 0.75rem 0.9rem;
+            border-radius: 14px;
+            background: #1c2537;
+            color: var(--text-soft);
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+
+        .bookify-chat-message.user {
+            align-self: flex-end;
+            background: #372466;
+            color: #fff;
+        }
+
+        .bookify-chat-form {
+            display: flex;
+            gap: 0.5rem;
+            padding: 0.8rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .bookify-chat-form textarea {
+            flex: 1;
+            min-width: 0;
+            resize: vertical;
+            color: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            background: #0b101b;
+            padding: 0.7rem;
+        }
+
+        .bookify-chat-form textarea:focus {
+            outline: 2px solid var(--accent);
+            outline-offset: 1px;
+        }
+
+        .bookify-chat-form button {
+            align-self: flex-end;
+            border: 0;
+            border-radius: 12px;
+            padding: 0.7rem 0.9rem;
+            color: #fff;
+            background: var(--accent-gradient);
+        }
+
+        @media (max-width: 575.98px) {
+            .bookify-chat-launcher { right: 1rem; bottom: 1rem; }
+            .bookify-chat-panel { right: 1rem; bottom: 4.8rem; }
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
@@ -210,7 +319,95 @@
         </div>
     </footer>
 
+    <section class="bookify-chat-panel" id="bookify-chat-panel" aria-label="Bookify AI yordamchisi" hidden>
+        <header class="bookify-chat-header">
+            <div>
+                <strong><i class="bi bi-stars text-warning me-1"></i> Bookify AI</strong>
+                <div class="small text-secondary">Kitob tanlashda yordam beraman</div>
+            </div>
+            <button type="button" id="bookify-chat-close" aria-label="Chatni yopish">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </header>
+        <div class="bookify-chat-messages" id="bookify-chat-messages" aria-live="polite">
+            <div class="bookify-chat-message">
+                Salom! Qanday kitob izlayapsiz? Janr, muallif yoki mavzuni yozing.
+            </div>
+        </div>
+        <form class="bookify-chat-form" id="bookify-chat-form">
+            {% csrf_token %}
+            <textarea id="bookify-chat-input" name="message" rows="1" maxlength="1000"
+                      placeholder="Savolingizni yozing..." aria-label="Savolingiz" required></textarea>
+            <button type="submit" aria-label="Xabarni yuborish">
+                <i class="bi bi-send-fill"></i>
+            </button>
+        </form>
+    </section>
+    <button class="bookify-chat-launcher" id="bookify-chat-toggle"
+            type="button" aria-expanded="false" aria-controls="bookify-chat-panel">
+        <i class="bi bi-chat-dots me-1"></i> AI bilan suhbat
+    </button>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        (() => {
+            const panel = document.getElementById("bookify-chat-panel");
+            const toggle = document.getElementById("bookify-chat-toggle");
+            const close = document.getElementById("bookify-chat-close");
+            const form = document.getElementById("bookify-chat-form");
+            const input = document.getElementById("bookify-chat-input");
+            const messages = document.getElementById("bookify-chat-messages");
+
+            const setOpen = (isOpen) => {
+                panel.hidden = !isOpen;
+                toggle.setAttribute("aria-expanded", String(isOpen));
+                if (isOpen) input.focus();
+            };
+
+            const addMessage = (text, sender) => {
+                const message = document.createElement("div");
+                message.className = `bookify-chat-message ${sender}`;
+                message.textContent = text;
+                messages.appendChild(message);
+                messages.scrollTop = messages.scrollHeight;
+                return message;
+            };
+
+            toggle.addEventListener("click", () => setOpen(panel.hidden));
+            close.addEventListener("click", () => setOpen(false));
+            form.addEventListener("submit", async (event) => {
+                event.preventDefault();
+                const question = input.value.trim();
+                if (!question) return;
+
+                addMessage(question, "user");
+                input.value = "";
+                input.disabled = true;
+                const pending = addMessage("Javob tayyorlanmoqda...", "assistant");
+                const csrfToken = form.querySelector("[name=csrfmiddlewaretoken]").value;
+
+                try {
+                    const response = await fetch("{% url 'ai_chat' %}", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRFToken": csrfToken
+                        },
+                        body: JSON.stringify({message: question})
+                    });
+                    const data = await response.json();
+                    if (!response.ok) throw new Error(data.error || "Xabar yuborilmadi.");
+                    pending.textContent = data.answer;
+                } catch (error) {
+                    pending.textContent = error.message || "Xatolik yuz berdi. Qayta urinib ko'ring.";
+                } finally {
+                    input.disabled = false;
+                    input.focus();
+                    messages.scrollTop = messages.scrollHeight;
+                }
+            });
+        })();
+    </script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

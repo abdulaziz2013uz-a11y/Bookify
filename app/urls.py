@@ -5,6 +5,7 @@ from django.urls import path, reverse_lazy
 from . import views
 
 urlpatterns = [
+    path("ai/chat/", views.ai_chat, name="ai_chat"),
     # Public home page and protected admin dashboard
     path("", views.books, name="home"),
     path("shifoxonalar/", views.shifoxona_list, name="shifoxona_list"),

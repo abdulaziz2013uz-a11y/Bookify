@@ -1,13 +1,52 @@
 import csv
 import io
+import json
 from django.contrib import messages
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import User
 from django.db.models import Avg, Count, Sum
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_POST
 
+from .ai_assistant import AssistantUnavailable, answer_question
 from .forms import ShifoxonaForm
 from .models import Book, Order, Review, Shifoxona
+
+
+@require_POST
+def ai_chat(request):
+    try:
+        payload = json.loads(request.body)
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        return JsonResponse({"error": "So'rov formati noto'g'ri."}, status=400)
+
+    question = payload.get("message") if isinstance(payload, dict) else None
+    if not isinstance(question, str) or not question.strip():
+        return JsonResponse(
+            {"error": "Savolingizni yozing."},
+            status=400,
+        )
+    question = question.strip()
+    if len(question) > 1000:
+        return JsonResponse(
+            {"error": "Savol 1000 ta belgidan oshmasligi kerak."},
+            status=400,
+        )
+
+    try:
+        answer = answer_question(question)
+    except AssistantUnavailable:
+        return JsonResponse(
+            {
+                "error": (
+                    "AI xizmati hozir javob bera olmayapti. "
+                    "Birozdan keyin yana urinib ko'ring."
+                )
+            },
+            status=502,
+        )
+    return JsonResponse({"answer": answer})
 
 
 def is_admin(user):
