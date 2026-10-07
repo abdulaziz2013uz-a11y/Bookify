@@ -58,7 +58,7 @@ def _local_recommendation(question, catalog):
     )
     recommendations = ranked_books[:3]
     lines = [
-        "Hozircha Gemini AI kaliti ulanmagan, ammo Bookify katalogidan "
+        "Hozircha AI API kaliti ulanmagan, ammo Bookify katalogidan "
         "sizga mos kitoblarni topdim:"
     ]
     for book in recommendations:
@@ -75,44 +75,76 @@ def _local_recommendation(question, catalog):
 
 def answer_question(question):
     catalog = _book_catalog()
-    api_key = os.environ.get("GEMINI_API_KEY", "").strip()
-    if not api_key:
+    groq_api_key = os.environ.get("GROQ_API_KEY", "").strip()
+    gemini_api_key = os.environ.get("GEMINI_API_KEY", "").strip()
+    if not groq_api_key and not gemini_api_key:
         return _local_recommendation(question, catalog)
 
-    prompt = (
+    system_prompt = (
         "Sen Bookify onlayn kitob do'konining o'zbek tilida javob beradigan "
         "kitob yordamchisisan. Faqat quyidagi katalogdagi ma'lumotlarga "
         "tayangan holda kitob tavsiya qil, kitoblar haqida savollarga javob "
         "ber va narxlarni ko'rsat. Katalogda yo'q ma'lumotni o'ylab topma. "
         "Savol kitoblarga aloqador bo'lmasa, muloyimlik bilan Bookify "
         "kitoblari haqida so'rashni taklif qil. Qisqa va tushunarli yoz.\n\n"
-        f"Katalog: {json.dumps(catalog, ensure_ascii=False)}\n\n"
-        f"Foydalanuvchi savoli: {question}"
+        f"Katalog: {json.dumps(catalog, ensure_ascii=False)}"
     )
-    payload = json.dumps(
-        {"contents": [{"parts": [{"text": prompt}]}]},
-        ensure_ascii=False,
-    ).encode("utf-8")
-    request = Request(
-        "https://generativelanguage.googleapis.com/v1beta/"
-        "models/gemini-2.5-flash:generateContent",
-        data=payload,
-        headers={
-            "Content-Type": "application/json",
-            "x-goog-api-key": api_key,
-        },
-        method="POST",
-    )
+    if groq_api_key:
+        provider = "Groq"
+        payload = json.dumps(
+            {
+                "model": os.environ.get(
+                    "GROQ_MODEL", "llama-3.3-70b-versatile"
+                ),
+                "messages": [
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": question},
+                ],
+                "temperature": 0.5,
+                "max_tokens": 500,
+            },
+            ensure_ascii=False,
+        ).encode("utf-8")
+        request = Request(
+            "https://api.groq.com/openai/v1/chat/completions",
+            data=payload,
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {groq_api_key}",
+            },
+            method="POST",
+        )
+    else:
+        provider = "Gemini"
+        prompt = f"{system_prompt}\n\nFoydalanuvchi savoli: {question}"
+        payload = json.dumps(
+            {"contents": [{"parts": [{"text": prompt}]}]},
+            ensure_ascii=False,
+        ).encode("utf-8")
+        request = Request(
+            "https://generativelanguage.googleapis.com/v1beta/"
+            "models/gemini-2.5-flash:generateContent",
+            data=payload,
+            headers={
+                "Content-Type": "application/json",
+                "x-goog-api-key": gemini_api_key,
+            },
+            method="POST",
+        )
+
     try:
         with urlopen(request, timeout=20) as response:
             result = json.loads(response.read().decode("utf-8"))
-        answer = result["candidates"][0]["content"]["parts"][0]["text"].strip()
+        if groq_api_key:
+            answer = result["choices"][0]["message"]["content"].strip()
+        else:
+            answer = result["candidates"][0]["content"]["parts"][0]["text"].strip()
         if not answer:
-            raise AssistantUnavailable("Gemini returned an empty answer")
+            raise AssistantUnavailable(f"{provider} returned an empty answer")
         return answer
     except HTTPError as error:
-        logger.warning("Gemini API returned HTTP %s", error.code)
+        logger.warning("%s API returned HTTP %s", provider, error.code)
         raise AssistantUnavailable from error
     except (URLError, TimeoutError, KeyError, IndexError, TypeError, ValueError) as error:
-        logger.warning("Gemini API request failed: %s", error)
+        logger.warning("%s API request failed: %s", provider, error)
         raise AssistantUnavailable from error

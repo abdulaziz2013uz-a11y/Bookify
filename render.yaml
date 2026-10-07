@@ -13,3 +13,5 @@ services:
         value: "bookify.onrender.com"
       - key: GEMINI_API_KEY
         sync: false
+      - key: GROQ_API_KEY
+        sync: false
