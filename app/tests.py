@@ -90,6 +90,47 @@ class AIChatTests(TestCase):
         )
         self.assertEqual(request.get_header("X-goog-api-key"), "test-key")
 
+    @patch.dict(
+        os.environ,
+        {
+            "OPENROUTER_API_KEY": "test-openrouter-key",
+            "GEMINI_API_KEY": "test-gemini-key",
+            "GROQ_API_KEY": "test-groq-key",
+        },
+    )
+    @patch("app.ai_assistant.urlopen")
+    def test_chat_uses_openrouter_when_api_key_is_configured(self, mock_urlopen):
+        from unittest.mock import MagicMock
+
+        mock_response = MagicMock()
+        mock_response.__enter__.return_value = mock_response
+        mock_response.read.return_value = json.dumps(
+            {"choices": [{"message": {"content": "OpenRouter tavsiyasi."}}]}
+        ).encode("utf-8")
+        mock_urlopen.return_value = mock_response
+
+        response = self.client.post(
+            "/ai/chat/",
+            data=json.dumps({"message": "Tarixiy kitob tavsiya qil"}),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["answer"], "OpenRouter tavsiyasi.")
+        request = mock_urlopen.call_args.args[0]
+        self.assertEqual(
+            request.full_url,
+            "https://openrouter.ai/api/v1/chat/completions",
+        )
+        self.assertEqual(
+            request.get_header("Authorization"),
+            "Bearer test-openrouter-key",
+        )
+        self.assertEqual(
+            json.loads(request.data)["model"],
+            "openrouter/free",
+        )
+
     @patch.dict(os.environ, {"GROQ_API_KEY": "test-groq-key"}, clear=False)
     @patch("app.ai_assistant.urlopen")
     def test_chat_uses_groq_when_groq_api_key_is_configured(self, mock_urlopen):

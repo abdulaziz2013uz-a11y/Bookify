@@ -77,9 +77,11 @@ def answer_question(question):
     catalog = _book_catalog()
     groq_api_key = os.environ.get("GROQ_API_KEY", "").strip()
     gemini_api_key = os.environ.get("GEMINI_API_KEY", "").strip()
-    if not groq_api_key and not gemini_api_key:
+    openrouter_api_key = os.environ.get("OPENROUTER_API_KEY", "").strip()
+    if not groq_api_key and not gemini_api_key and not openrouter_api_key:
         return _local_recommendation(question, catalog)
-    use_groq = bool(groq_api_key and not gemini_api_key)
+    use_openrouter = bool(openrouter_api_key)
+    use_groq = bool(groq_api_key and not gemini_api_key and not use_openrouter)
 
     system_prompt = (
         "Sen Bookify onlayn kitob do'konining o'zbek tilida javob beradigan "
@@ -90,7 +92,33 @@ def answer_question(question):
         "kitoblari haqida so'rashni taklif qil. Qisqa va tushunarli yoz.\n\n"
         f"Katalog: {json.dumps(catalog, ensure_ascii=False)}"
     )
-    if use_groq:
+    if use_openrouter:
+        provider = "OpenRouter"
+        payload = json.dumps(
+            {
+                "model": os.environ.get(
+                    "OPENROUTER_MODEL", "openrouter/free"
+                ),
+                "messages": [
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": question},
+                ],
+                "temperature": 0.5,
+                "max_tokens": 500,
+            },
+            ensure_ascii=False,
+        ).encode("utf-8")
+        request = Request(
+            "https://openrouter.ai/api/v1/chat/completions",
+            data=payload,
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {openrouter_api_key}",
+                "X-Title": "Bookify",
+            },
+            method="POST",
+        )
+    elif use_groq:
         provider = "Groq"
         payload = json.dumps(
             {
@@ -136,7 +164,7 @@ def answer_question(question):
     try:
         with urlopen(request, timeout=20) as response:
             result = json.loads(response.read().decode("utf-8"))
-        if use_groq:
+        if use_openrouter or use_groq:
             answer = result["choices"][0]["message"]["content"].strip()
         else:
             answer = result["candidates"][0]["content"]["parts"][0]["text"].strip()
