@@ -30,6 +30,7 @@ class AIChatTests(TestCase):
     def test_chat_returns_catalog_recommendation_without_api_key(self):
         os.environ.pop("GROQ_API_KEY", None)
         os.environ.pop("GEMINI_API_KEY", None)
+        os.environ.pop("OPENROUTER_API_KEY", None)
         response = self.client.post(
             "/ai/chat/",
             data=json.dumps({"message": "tarixiy roman tavsiya qil"}),
@@ -57,7 +58,11 @@ class AIChatTests(TestCase):
 
     @patch.dict(
         os.environ,
-        {"GEMINI_API_KEY": "test-key", "GROQ_API_KEY": "test-groq-key"},
+        {
+            "GEMINI_API_KEY": "test-key",
+            "GROQ_API_KEY": "test-groq-key",
+            "OPENROUTER_API_KEY": "",
+        },
     )
     @patch("app.ai_assistant.urlopen")
     def test_chat_uses_gemini_when_api_key_is_configured(self, mock_urlopen):
@@ -131,7 +136,11 @@ class AIChatTests(TestCase):
             "openrouter/free",
         )
 
-    @patch.dict(os.environ, {"GROQ_API_KEY": "test-groq-key"}, clear=False)
+    @patch.dict(
+        os.environ,
+        {"GROQ_API_KEY": "test-groq-key", "OPENROUTER_API_KEY": ""},
+        clear=False,
+    )
     @patch("app.ai_assistant.urlopen")
     def test_chat_uses_groq_when_groq_api_key_is_configured(self, mock_urlopen):
         from unittest.mock import MagicMock
