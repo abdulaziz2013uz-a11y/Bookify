@@ -79,6 +79,7 @@ def answer_question(question):
     gemini_api_key = os.environ.get("GEMINI_API_KEY", "").strip()
     if not groq_api_key and not gemini_api_key:
         return _local_recommendation(question, catalog)
+    use_groq = bool(groq_api_key and not gemini_api_key)
 
     system_prompt = (
         "Sen Bookify onlayn kitob do'konining o'zbek tilida javob beradigan "
@@ -89,7 +90,7 @@ def answer_question(question):
         "kitoblari haqida so'rashni taklif qil. Qisqa va tushunarli yoz.\n\n"
         f"Katalog: {json.dumps(catalog, ensure_ascii=False)}"
     )
-    if groq_api_key:
+    if use_groq:
         provider = "Groq"
         payload = json.dumps(
             {
@@ -135,7 +136,7 @@ def answer_question(question):
     try:
         with urlopen(request, timeout=20) as response:
             result = json.loads(response.read().decode("utf-8"))
-        if groq_api_key:
+        if use_groq:
             answer = result["choices"][0]["message"]["content"].strip()
         else:
             answer = result["candidates"][0]["content"]["parts"][0]["text"].strip()

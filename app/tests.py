@@ -55,7 +55,10 @@ class AIChatTests(TestCase):
         self.assertEqual(empty_response.status_code, 400)
         self.assertEqual(oversized_response.status_code, 400)
 
-    @patch.dict(os.environ, {"GEMINI_API_KEY": "test-key"})
+    @patch.dict(
+        os.environ,
+        {"GEMINI_API_KEY": "test-key", "GROQ_API_KEY": "test-groq-key"},
+    )
     @patch("app.ai_assistant.urlopen")
     def test_chat_uses_gemini_when_api_key_is_configured(self, mock_urlopen):
         from unittest.mock import MagicMock
@@ -80,6 +83,11 @@ class AIChatTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["answer"], "Mana sizga kitob tavsiyasi.")
         request = mock_urlopen.call_args.args[0]
+        self.assertEqual(
+            request.full_url,
+            "https://generativelanguage.googleapis.com/v1beta/"
+            "models/gemini-2.5-flash:generateContent",
+        )
         self.assertEqual(request.get_header("X-goog-api-key"), "test-key")
 
     @patch.dict(os.environ, {"GROQ_API_KEY": "test-groq-key"}, clear=False)
