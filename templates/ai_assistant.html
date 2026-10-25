@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#ffffff">
+    <title>Bookify AI — Kitob tanlashda yordamchi</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            color-scheme: light;
+            --ink: #20242c;
+            --muted: #737b88;
+            --line: #e8eaee;
+            --blue: #397cf6;
+            --blue-soft: #edf4ff;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-width: 320px;
+            min-height: 100vh;
+            min-height: 100svh;
+            color: var(--ink);
+            background: #fff;
+            font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        button, textarea { font: inherit; }
+        button { color: inherit; }
+
+        .ai-app {
+            min-height: 100vh;
+            min-height: 100svh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .ai-header {
+            height: 72px;
+            flex: 0 0 72px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 34px;
+            border-bottom: 1px solid #f0f1f3;
+        }
+
+        .brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--ink);
+            text-decoration: none;
+            font-size: 17px;
+            font-weight: 750;
+            letter-spacing: -0.45px;
+        }
+
+        .brand-mark {
+            width: 34px;
+            height: 34px;
+            display: grid;
+            place-items: center;
+            border-radius: 11px;
+            color: #fff;
+            background: linear-gradient(145deg, #5796ff, #3473e9);
+            box-shadow: 0 4px 12px rgba(57, 124, 246, 0.2);
+            font-size: 17px;
+        }
+
+        .brand-ai {
+            margin-left: 1px;
+            padding: 4px 7px;
+            border-radius: 6px;
+            color: #477fe1;
+            background: var(--blue-soft);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.55px;
+            text-transform: uppercase;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #5e6571;
+            font-size: 13px;
+            font-weight: 550;
+            text-decoration: none;
+            transition: color 160ms ease;
+        }
+
+        .back-link:hover { color: var(--blue); }
+
+        .ai-main {
+            position: relative;
+            width: min(100%, 1020px);
+            flex: 1;
+            min-height: 0;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            padding: 24px 28px 18px;
+        }
+
+        .welcome {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 0 0 42px;
+            text-align: center;
+        }
+
+        .welcome-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            margin-bottom: 20px;
+            color: #4d7fce;
+            font-size: 12px;
+            font-weight: 650;
+            letter-spacing: 0.18px;
+        }
+
+        .welcome-badge i { font-size: 14px; }
+
+        h1 {
+            margin: 0;
+            color: #20242c;
+            font-size: clamp(26px, 4vw, 35px);
+            font-weight: 600;
+            letter-spacing: -1.2px;
+            line-height: 1.25;
+        }
+
+        .welcome-copy {
+            margin: 12px 0 28px;
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.65;
+        }
+
+        .composer {
+            width: min(100%, 700px);
+            padding: 11px 12px 10px 20px;
+            border: 1px solid #e4e7ec;
+            border-radius: 22px;
+            background: #fff;
+            box-shadow: 0 7px 28px rgba(26, 36, 55, 0.075), 0 1px 3px rgba(26, 36, 55, 0.04);
+            transition: border-color 160ms ease, box-shadow 160ms ease;
+        }
+
+        .composer:focus-within {
+            border-color: #b9d0ff;
+            box-shadow: 0 8px 30px rgba(41, 103, 220, 0.1), 0 0 0 3px rgba(57, 124, 246, 0.07);
+        }
+
+        .composer-row {
+            display: flex;
+            align-items: flex-end;
+            gap: 12px;
+        }
+
+        .composer textarea {
+            flex: 1;
+            min-width: 0;
+            max-height: 180px;
+            min-height: 40px;
+            padding: 10px 0 7px;
+            resize: none;
+            border: 0;
+            outline: 0;
+            color: var(--ink);
+            background: transparent;
+            font-size: 14px;
+            line-height: 1.55;
+        }
+
+        .composer textarea::placeholder { color: #9aa1ac; }
+        .composer textarea:disabled { opacity: 0.65; }
+
+        .send-button {
+            width: 40px;
+            height: 40px;
+            flex: 0 0 40px;
+            display: grid;
+            place-items: center;
+            border: 0;
+            border-radius: 50%;
+            color: #fff;
+            background: var(--blue);
+            cursor: pointer;
+            transition: background 160ms ease, transform 160ms ease;
+        }
+
+        .send-button:hover:not(:disabled) { background: #2869df; transform: translateY(-1px); }
+        .send-button:disabled { background: #a9c4f5; cursor: not-allowed; }
+        .send-button i { font-size: 16px; }
+
+        .composer-hint {
+            margin: 5px 0 0 2px;
+            color: #a0a6b0;
+            font-size: 10px;
+            text-align: center;
+        }
+
+        .suggestions {
+            width: min(100%, 700px);
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+            margin-top: 17px;
+            text-align: left;
+        }
+
+        .suggestion {
+            min-height: 69px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 13px 14px;
+            border: 1px solid #eceef1;
+            border-radius: 13px;
+            color: #535b67;
+            background: #fff;
+            cursor: pointer;
+            font-size: 11px;
+            line-height: 1.5;
+            text-align: left;
+            transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+        }
+
+        .suggestion:hover {
+            transform: translateY(-2px);
+            border-color: #c9dafb;
+            background: #fbfdff;
+        }
+
+        .suggestion i {
+            flex: 0 0 auto;
+            margin-top: 1px;
+            color: #5a8be2;
+            font-size: 14px;
+        }
+
+        .conversation {
+            width: min(100%, 720px);
+            flex: 1;
+            display: none;
+            flex-direction: column;
+            gap: 24px;
+            overflow-y: auto;
+            align-self: center;
+            padding: 12px 8px 30px;
+            scroll-behavior: smooth;
+        }
+
+        .conversation[aria-hidden="false"] { display: flex; }
+        .welcome[hidden] { display: none; }
+
+        .message {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            animation: appear 180ms ease-out;
+        }
+
+        .message.user { justify-content: flex-end; }
+
+        .message-avatar {
+            width: 30px;
+            height: 30px;
+            flex: 0 0 30px;
+            display: grid;
+            place-items: center;
+            border-radius: 10px;
+            color: #fff;
+            background: linear-gradient(145deg, #5796ff, #3473e9);
+            font-size: 14px;
+        }
+
+        .message-body {
+            max-width: min(88%, 610px);
+            padding: 7px 0;
+            color: #343a44;
+            font-size: 14px;
+            line-height: 1.75;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+
+        .message.user .message-body {
+            max-width: min(82%, 550px);
+            padding: 12px 16px;
+            border: 1px solid #e8edf5;
+            border-radius: 18px 18px 5px 18px;
+            background: #f4f7fb;
+        }
+
+        .message.error .message-body { color: #b54747; }
+
+        .composer-dock {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .composer-dock[hidden] { display: none; }
+
+        .ai-main.has-messages .composer-dock {
+            position: sticky;
+            bottom: 0;
+            z-index: 2;
+            width: 100%;
+            padding-top: 14px;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0), #fff 18%);
+        }
+
+        .ai-main.has-messages .composer { width: min(100%, 700px); }
+        .ai-main.has-messages .suggestions { display: none; }
+
+        .ai-footer {
+            padding: 6px 0 2px;
+            color: #a0a6b0;
+            font-size: 10px;
+            text-align: center;
+        }
+
+        .ai-main.has-messages .welcome-footer { display: none; }
+
+        @keyframes appear {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 640px) {
+            .ai-header { height: 62px; flex-basis: 62px; padding: 0 17px; }
+            .brand { gap: 8px; font-size: 15px; }
+            .brand-mark { width: 31px; height: 31px; }
+            .back-link { gap: 5px; font-size: 11px; }
+            .ai-main { padding: 14px 16px 12px; }
+            .welcome { justify-content: center; padding: 0 0 25px; }
+            .welcome-copy { max-width: 310px; margin: 10px 0 23px; font-size: 13px; }
+            .composer { padding: 8px 9px 8px 15px; border-radius: 19px; }
+            .composer textarea { font-size: 13px; }
+            .send-button { width: 38px; height: 38px; flex-basis: 38px; }
+            .suggestions { grid-template-columns: 1fr; gap: 8px; margin-top: 12px; }
+            .suggestion { min-height: 48px; align-items: center; padding: 11px 13px; font-size: 12px; }
+            .conversation { padding: 10px 0 24px; }
+            .message-body { font-size: 13px; }
+            .ai-main.has-messages .composer-dock { padding-top: 8px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; }
+        }
+    </style>
+</head>
+<body>
+    <div class="ai-app">
+        <header class="ai-header">
+            <a class="brand" href="{% url 'books_list' %}" aria-label="Bookify bosh sahifasi">
+                <span class="brand-mark"><i class="bi bi-book-half"></i></span>
+                <span>Bookify</span>
+                <span class="brand-ai">AI</span>
+            </a>
+            <a class="back-link" href="{% url 'books_list' %}">
+                <i class="bi bi-arrow-left"></i>
+                <span>Kutubxonaga qaytish</span>
+            </a>
+        </header>
+
+        <main class="ai-main" id="ai-main">
+            <section class="welcome" id="welcome">
+                <div class="welcome-badge"><i class="bi bi-stars"></i> Shaxsiy kitob yordamchingiz</div>
+                <h1>Bugun qanday kitob izlayapsiz?</h1>
+                <p class="welcome-copy">Qiziqishlaringizni ayting — sizga mos kitoblarni birga topamiz.</p>
+
+                <div class="composer-dock">
+                    <form class="composer" id="chat-form">
+                        {% csrf_token %}
+                        <div class="composer-row">
+                            <textarea id="chat-input" name="message" rows="1" maxlength="1000"
+                                      placeholder="Kitoblar haqida so‘rang..." aria-label="Bookify AI ga xabar yozing"
+                                      required></textarea>
+                            <button class="send-button" id="send-button" type="submit"
+                                    aria-label="Xabarni yuborish">
+                                <i class="bi bi-arrow-up"></i>
+                            </button>
+                        </div>
+                    </form>
+                    <div class="suggestions" aria-label="Tavsiya etilgan savollar">
+                        <button class="suggestion" type="button" data-prompt="Menga qiziqarli tarixiy roman tavsiya qil">
+                            <i class="bi bi-book"></i><span>Qiziqarli tarixiy roman tavsiya qil</span>
+                        </button>
+                        <button class="suggestion" type="button" data-prompt="O‘zbek adabiyotini nimadan boshlab o‘qisam bo‘ladi?">
+                            <i class="bi bi-lightbulb"></i><span>O‘zbek adabiyotini nimadan boshlasam bo‘ladi?</span>
+                        </button>
+                        <button class="suggestion" type="button" data-prompt="Kitob tanlashimga yordam ber. Men sarguzashtlarni yoqtiraman">
+                            <i class="bi bi-compass"></i><span>O‘zimga mos kitobni topishga yordam ber</span>
+                        </button>
+                    </div>
+                    <div class="ai-footer welcome-footer">Bookify AI ba’zan xato qilishi mumkin. Muhim ma’lumotlarni tekshirib ko‘ring.</div>
+                </div>
+            </section>
+
+            <section class="conversation" id="conversation" aria-label="Suhbat" aria-live="polite" aria-hidden="true"></section>
+            <div class="composer-dock" id="active-composer" hidden>
+                <form class="composer" id="active-chat-form">
+                    <div class="composer-row">
+                        <textarea id="active-chat-input" name="message" rows="1" maxlength="1000"
+                                  placeholder="Yana bir savol bering..." aria-label="Bookify AI ga xabar yozing"
+                                  required></textarea>
+                        <button class="send-button" id="active-send-button" type="submit"
+                                aria-label="Xabarni yuborish">
+                            <i class="bi bi-arrow-up"></i>
+                        </button>
+                    </div>
+                </form>
+                <div class="ai-footer">Bookify AI xato qilishi mumkin. Javoblarni tekshirib ko‘ring.</div>
+            </div>
+        </main>
+    </div>
+    <script>
+        (() => {
+            const main = document.getElementById("ai-main");
+            const welcome = document.getElementById("welcome");
+            const conversation = document.getElementById("conversation");
+            const activeComposer = document.getElementById("active-composer");
+            const firstForm = document.getElementById("chat-form");
+            const firstInput = document.getElementById("chat-input");
+            const csrfToken = firstForm.querySelector("[name=csrfmiddlewaretoken]").value;
+            let busy = false;
+
+            const showConversation = () => {
+                welcome.hidden = true;
+                activeComposer.hidden = false;
+                conversation.setAttribute("aria-hidden", "false");
+                main.classList.add("has-messages");
+            };
+
+            const appendMessage = (text, sender, error = false) => {
+                const message = document.createElement("article");
+                message.className = `message ${sender}${error ? " error" : ""}`;
+                if (sender === "assistant") {
+                    const avatar = document.createElement("span");
+                    avatar.className = "message-avatar";
+                    avatar.setAttribute("aria-hidden", "true");
+                    avatar.innerHTML = '<i class="bi bi-stars"></i>';
+                    message.appendChild(avatar);
+                }
+                const body = document.createElement("div");
+                body.className = "message-body";
+                body.textContent = text;
+                message.appendChild(body);
+                conversation.appendChild(message);
+                conversation.scrollTop = conversation.scrollHeight;
+                return body;
+            };
+
+            const sendMessage = async (rawText, input, button) => {
+                const question = rawText.trim();
+                if (!question || busy) return;
+
+                showConversation();
+                appendMessage(question, "user");
+                input.value = "";
+                input.style.height = "auto";
+                busy = true;
+                input.disabled = true;
+                button.disabled = true;
+                const responseBody = appendMessage("Javob tayyorlanmoqda...", "assistant");
+
+                try {
+                    const response = await fetch("{% url 'ai_chat' %}", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRFToken": csrfToken
+                        },
+                        body: JSON.stringify({message: question})
+                    });
+                    const data = await response.json();
+                    if (!response.ok) throw new Error(data.error || "Xabar yuborilmadi.");
+                    responseBody.textContent = data.answer;
+                } catch (error) {
+                    responseBody.textContent = error.message || "Xatolik yuz berdi. Qayta urinib ko‘ring.";
+                    responseBody.closest(".message").classList.add("error");
+                } finally {
+                    busy = false;
+                    input.disabled = false;
+                    button.disabled = false;
+                    input.focus();
+                    conversation.scrollTop = conversation.scrollHeight;
+                }
+            };
+
+            firstForm.addEventListener("submit", (event) => {
+                event.preventDefault();
+                sendMessage(firstInput.value, firstInput, firstForm.querySelector("button"));
+            });
+
+            document.getElementById("active-chat-form").addEventListener("submit", (event) => {
+                event.preventDefault();
+                const form = event.currentTarget;
+                sendMessage(
+                    form.querySelector("textarea").value,
+                    form.querySelector("textarea"),
+                    form.querySelector("button")
+                );
+            });
+
+            document.querySelectorAll(".composer textarea").forEach((input) => {
+                input.addEventListener("input", () => {
+                    input.style.height = "auto";
+                    input.style.height = `${Math.min(input.scrollHeight, 180)}px`;
+                });
+                input.addEventListener("keydown", (event) => {
+                    if (event.key === "Enter" && !event.shiftKey) {
+                        event.preventDefault();
+                        input.form.requestSubmit();
+                    }
+                });
+            });
+
+            document.querySelectorAll("[data-prompt]").forEach((button) => {
+                button.addEventListener("click", () => {
+                    firstInput.value = button.dataset.prompt;
+                    sendMessage(firstInput.value, firstInput, firstForm.querySelector("button"));
+                });
+            });
+        })();
+    </script>
+</body>
+</html>

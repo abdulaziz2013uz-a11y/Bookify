@@ -14,6 +14,10 @@ from .forms import ShifoxonaForm
 from .models import Book, Order, Review, Shifoxona
 
 
+def ai_assistant(request):
+    return render(request, "ai_assistant.html")
+
+
 @require_POST
 def ai_chat(request):
     try:

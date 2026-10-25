@@ -19,12 +19,19 @@ class AIChatTests(TestCase):
             published_date="1925-01-01",
         )
 
-    def test_public_books_page_shows_chat_widget(self):
+    def test_public_books_page_links_to_bookify_ai(self):
         response = self.client.get("/")
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Bookify AI")
+
+    def test_ai_assistant_page_shows_chat_composer(self):
+        response = self.client.get("/ai/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Bugun qanday kitob izlayapsiz?")
         self.assertContains(response, "csrfmiddlewaretoken")
+        self.assertContains(response, 'data-prompt="Menga qiziqarli tarixiy roman tavsiya qil"')
 
     @patch.dict(os.environ, {}, clear=False)
     def test_chat_returns_catalog_recommendation_without_api_key(self):
