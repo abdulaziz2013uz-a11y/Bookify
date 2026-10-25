@@ -4,7 +4,7 @@ import json
 from django.contrib import messages
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import User
-from django.db.models import Avg, Count, Sum
+from django.db.models import Avg, Count, Q, Sum
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
@@ -137,7 +137,9 @@ def books(request):
 
     query = request.GET.get("q")
     if query:
-        books_list = books_list.filter(title__icontains=query)
+        books_list = books_list.filter(
+            Q(title__icontains=query) | Q(author__icontains=query)
+        )
 
     sort = request.GET.get("sort")
     if sort == "price_asc":

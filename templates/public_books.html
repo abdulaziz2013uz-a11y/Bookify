@@ -1,228 +1,1373 @@
 {% extends 'base_public.html' %}
 
-{% block title %}Kitoblar - Bookify{% endblock %}
+{% block title %}Kitoblar katalogi - Bookify{% endblock %}
 
 {% block extra_css %}
+<meta name="theme-color" content="#f4efe6">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-    .hero-section {
-        padding: 3.5rem 0 2.5rem;
+    :root {
+        --paper: #f4efe6;
+        --paper-light: #fffcf6;
+        --paper-deep: #e8dfd0;
+        --ink: #162820;
+        --ink-soft: #2d4037;
+        --muted: #73776e;
+        --line: rgba(22, 40, 32, 0.11);
+        --clay: #c56f4c;
+        --clay-dark: #a95636;
+        --moss: #496554;
+        --accent: #c56f4c;
+        --accent-dark: #a95636;
+        --accent-gradient: linear-gradient(135deg, #c56f4c 0%, #d88c67 100%);
+        --display: 'Fraunces', Georgia, 'Times New Roman', serif;
+        --body: 'Manrope', 'Inter', system-ui, sans-serif;
     }
 
-    .hero-badge {
-        background: rgba(139, 92, 246, 0.12);
-        border: 1px solid rgba(139, 92, 246, 0.3);
-        color: #c4b5fd;
-        padding: 6px 16px;
-        border-radius: 999px;
-        font-size: 0.85rem;
-        font-weight: 500;
+    body,
+    body * {
+        font-family: var(--body);
+    }
+
+    body {
+        color: var(--ink);
+        background-color: var(--paper);
+        background-image:
+            radial-gradient(circle at 88% 5%, rgba(197, 111, 76, 0.16), transparent 28rem),
+            radial-gradient(circle at 5% 35%, rgba(73, 101, 84, 0.12), transparent 32rem),
+            linear-gradient(180deg, #f7f3eb 0%, var(--paper) 52%, #f1ebdf 100%);
+        background-attachment: fixed;
+        overflow-x: hidden;
+    }
+
+    /* ---------- Navigatsiya ---------- */
+    .public-navbar {
+        background: rgba(247, 243, 235, 0.88);
+        border-bottom: 1px solid var(--line);
+        box-shadow: 0 8px 30px rgba(22, 40, 32, 0.035);
+        padding: 0.85rem 0;
+    }
+
+    .public-navbar .brand {
+        color: var(--ink);
+        font-family: var(--display);
+        font-size: 1.45rem;
+        font-weight: 700;
+        letter-spacing: -0.035em;
+    }
+
+    .public-navbar .brand i {
+        color: var(--clay);
+        text-shadow: none;
+    }
+
+    .nav-search input {
+        color: var(--ink);
+        background: rgba(255, 252, 246, 0.92);
+        border-color: var(--line);
+    }
+
+    .nav-search input::placeholder {
+        color: #8a8d84;
+    }
+
+    .nav-search input:focus {
+        color: var(--ink);
+        border-color: rgba(197, 111, 76, 0.65);
+        background: #fff;
+        box-shadow: 0 0 0 4px rgba(197, 111, 76, 0.12);
+    }
+
+    .nav-search i {
+        color: #84887f;
+    }
+
+    .public-navbar .btn-admin-link {
+        color: var(--ink);
+        background: transparent;
+        border-color: var(--line);
+    }
+
+    .public-navbar .btn-admin-link:hover {
+        color: #fff;
+        background: var(--ink);
+        border-color: var(--ink);
+    }
+
+    .public-navbar .btn-admin-link.ai-nav-link {
+        color: #fffaf2;
+        background: var(--ink);
+        border-color: var(--ink);
+    }
+
+    .public-navbar .btn-admin-link.ai-nav-link:hover {
+        background: var(--clay);
+        border-color: var(--clay);
+    }
+
+    /* ---------- Hero ---------- */
+    .catalog-hero {
+        position: relative;
+        overflow: hidden;
+        padding: clamp(2.75rem, 6vw, 5.5rem) 0 clamp(3.5rem, 7vw, 6.5rem);
+    }
+
+    .catalog-hero::before {
+        content: "BOOKS";
+        position: absolute;
+        top: 1.2rem;
+        right: -1.5rem;
+        z-index: 0;
+        color: rgba(22, 40, 32, 0.035);
+        font-family: var(--display);
+        font-size: clamp(9rem, 23vw, 22rem);
+        font-weight: 700;
+        letter-spacing: -0.08em;
+        line-height: 0.8;
+        pointer-events: none;
+        user-select: none;
+    }
+
+    .catalog-hero .container {
+        position: relative;
+        z-index: 1;
+    }
+
+    .hero-eyebrow {
         display: inline-flex;
         align-items: center;
-        gap: 8px;
-        margin-bottom: 1.25rem;
+        gap: 0.7rem;
+        margin-bottom: 1.5rem;
+        color: var(--clay-dark);
+        font-size: 0.71rem;
+        font-weight: 800;
+        letter-spacing: 0.19em;
+        text-transform: uppercase;
     }
 
-    .hero-badge .dot {
-        width: 8px;
-        height: 8px;
-        background-color: #a855f7;
-        border-radius: 50%;
-        box-shadow: 0 0 10px #a855f7;
+    .hero-eyebrow::before {
+        content: "";
+        width: 2.1rem;
+        height: 1px;
+        background: currentColor;
     }
 
-    .text-gradient {
-        background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+    .hero-title {
+        max-width: 680px;
+        margin: 0;
+        color: var(--ink);
+        font-family: var(--display);
+        font-size: clamp(3.3rem, 7.2vw, 6.5rem);
+        font-weight: 600;
+        letter-spacing: -0.055em;
+        line-height: 0.94;
     }
 
-    .input-group-text.dark-glass,
-    .form-control.dark-glass {
-        background-color: rgba(18, 24, 38, 0.8);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        color: #f3f4f6;
+    .hero-title em {
+        color: var(--clay);
+        font-weight: 500;
     }
 
-    .form-control.dark-glass:focus {
-        background-color: rgba(18, 24, 38, 0.95);
-        border-color: #8b5cf6;
-        box-shadow: none;
-        color: #fff;
+    .hero-lead {
+        max-width: 550px;
+        margin: 1.65rem 0 2rem;
+        color: var(--muted);
+        font-size: clamp(0.95rem, 1.4vw, 1.06rem);
+        line-height: 1.75;
     }
 
-    .form-select.dark-glass {
-        background-color: rgba(18, 24, 38, 0.8);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        color: #f3f4f6;
-        border-radius: 10px;
-    }
-
-    .form-select.dark-glass option {
-        background-color: #121826;
-        color: #fff;
-    }
-
-    /* Kitob Kartochkasi */
-    .book-card {
-        background: rgba(18, 24, 38, 0.65);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 18px;
-        overflow: hidden;
-        transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .book-card:hover {
-        transform: translateY(-8px);
-        border: 3px solid #a855f7;
-        box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.28),
-                    0 14px 34px rgba(139, 92, 246, 0.42);
-    }
-
-    .book-card .cover {
-        height: 230px;
-        background: #0f172a;
+    .catalog-search {
         display: flex;
         align-items: center;
-        justify-content: center;
-        overflow: hidden;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        width: min(100%, 590px);
+        padding: 0.38rem 0.38rem 0.38rem 1.15rem;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: rgba(255, 252, 246, 0.98);
+        box-shadow: 0 16px 40px rgba(22, 40, 32, 0.07), 0 2px 4px rgba(22, 40, 32, 0.03);
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
 
-    .book-card .cover img {
+    .catalog-search:focus-within {
+        border-color: rgba(197, 111, 76, 0.65);
+        box-shadow: 0 16px 40px rgba(22, 40, 32, 0.07), 0 0 0 4px rgba(197, 111, 76, 0.1);
+    }
+
+    .catalog-search > i {
+        flex: 0 0 auto;
+        color: #8a8d84;
+        font-size: 1.05rem;
+    }
+
+    .catalog-search input {
+        flex: 1;
+        min-width: 0;
+        padding: 0.72rem 0.8rem;
+        border: 0;
+        outline: 0;
+        color: var(--ink);
+        background: transparent;
+        font-size: 0.92rem;
+    }
+
+    .catalog-search input::placeholder {
+        color: #94978e;
+    }
+
+    .catalog-search button {
+        display: inline-flex;
+        flex: 0 0 auto;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.8rem 1.15rem;
+        border: 0;
+        border-radius: 12px;
+        color: #fffaf2;
+        background: var(--ink);
+        font-size: 0.84rem;
+        font-weight: 700;
+        transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    .catalog-search button:hover {
+        background: var(--clay);
+        transform: translateY(-1px);
+    }
+
+    .catalog-page a:focus-visible,
+    .catalog-page button:focus-visible,
+    .public-navbar a:focus-visible,
+    .public-footer a:focus-visible,
+    .sort-select-wrap select:focus-visible {
+        outline: 3px solid rgba(197, 111, 76, 0.5);
+        outline-offset: 3px;
+    }
+
+    .hero-facts {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 1.25rem;
+        margin-top: 1.9rem;
+    }
+
+    .hero-fact strong {
+        display: block;
+        color: var(--ink);
+        font-family: var(--display);
+        font-size: 1.45rem;
+        font-weight: 600;
+        letter-spacing: -0.03em;
+        line-height: 1;
+    }
+
+    .hero-fact span {
+        display: block;
+        margin-top: 0.28rem;
+        color: var(--muted);
+        font-size: 0.66rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+    }
+
+    .hero-fact-divider {
+        width: 1px;
+        height: 2.25rem;
+        background: var(--line);
+    }
+
+    /* Herodagi kitoblar kompozitsiyasi */
+    .hero-art {
+        position: relative;
+        min-height: 530px;
+        overflow: hidden;
+        isolation: isolate;
+        border-radius: 32px;
+        background:
+            radial-gradient(circle at 30% 18%, rgba(197, 111, 76, 0.28), transparent 34%),
+            linear-gradient(145deg, #223d31 0%, #14271f 52%, #0e1d17 100%);
+        box-shadow: 0 32px 70px rgba(22, 40, 32, 0.22);
+    }
+
+    .hero-art::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        opacity: 0.35;
+        background-image:
+            linear-gradient(rgba(255, 255, 255, 0.055) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.055) 1px, transparent 1px);
+        background-size: 46px 46px;
+        mask-image: linear-gradient(to bottom, #000, transparent 80%);
+        -webkit-mask-image: linear-gradient(to bottom, #000, transparent 80%);
+    }
+
+    .hero-art::after {
+        content: "";
+        position: absolute;
+        right: -7rem;
+        bottom: -9rem;
+        z-index: 0;
+        width: 24rem;
+        height: 24rem;
+        border: 1px solid rgba(255, 250, 242, 0.13);
+        border-radius: 50%;
+        box-shadow:
+            0 0 0 2.8rem rgba(255, 250, 242, 0.025),
+            0 0 0 5.8rem rgba(255, 250, 242, 0.02);
+    }
+
+    .hero-book {
+        position: absolute;
+        display: block;
+        aspect-ratio: 2 / 3;
+        overflow: hidden;
+        border: 5px solid #fbf6ec;
+        border-radius: 7px 13px 13px 7px;
+        background: #d8cdbb;
+        box-shadow: -12px 28px 48px rgba(0, 0, 0, 0.4);
+        transition: transform 0.45s cubic-bezier(0.2, 0.75, 0.25, 1);
+    }
+
+    .hero-book::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        box-shadow: inset 8px 0 16px rgba(0, 0, 0, 0.16), inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+        pointer-events: none;
+    }
+
+    .hero-book img {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        transition: transform 0.35s ease;
     }
 
-    .book-card:hover .cover img {
-        transform: scale(1.04);
+    .hero-book-cover-empty {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        color: rgba(255, 250, 242, 0.75);
+        background: linear-gradient(145deg, #4c6c59, #1e3a2d);
+        font-family: var(--display);
+        font-size: 4.5rem;
     }
 
-    .book-card .body {
-        padding: 1.1rem;
+    .hero-book-1 {
+        top: 18%;
+        left: 5%;
+        z-index: 1;
+        width: 41%;
+        transform: rotate(-10deg);
+    }
+
+    .hero-book-2 {
+        top: 7%;
+        left: 30%;
+        z-index: 3;
+        width: 46%;
+        transform: rotate(2.5deg);
+    }
+
+    .hero-book-3 {
+        top: 24%;
+        right: 2%;
+        z-index: 2;
+        width: 38%;
+        transform: rotate(12deg);
+    }
+
+    .hero-art-1 .hero-book-1 {
+        top: 7%;
+        left: 20%;
+        width: 59%;
+        transform: rotate(-2deg);
+    }
+
+    .hero-art.hero-art-1:hover .hero-book-1 {
+        transform: rotate(0deg) translateY(-8px);
+    }
+
+    .hero-art-2 .hero-book-1 {
+        top: 16%;
+        left: 9%;
+        width: 44%;
+        transform: rotate(-8deg);
+    }
+
+    .hero-art-2 .hero-book-2 {
+        top: 8%;
+        left: 39%;
+        width: 48%;
+        transform: rotate(8deg);
+    }
+
+    .hero-art.hero-art-2:hover .hero-book-1 {
+        transform: rotate(-11deg) translateY(-4px);
+    }
+
+    .hero-art.hero-art-2:hover .hero-book-2 {
+        transform: rotate(5deg) translateY(-7px);
+    }
+
+    .hero-art-0 .hero-book-2 {
+        top: 10%;
+        left: 23%;
+        width: 54%;
+        transform: rotate(-2deg);
+    }
+
+    .hero-art.hero-art-0:hover .hero-book-2 {
+        transform: rotate(0deg) translateY(-7px);
+    }
+
+    .hero-art:hover .hero-book-1 {
+        transform: rotate(-13deg) translateY(-5px);
+    }
+
+    .hero-art:hover .hero-book-2 {
+        transform: rotate(0deg) translateY(-8px);
+    }
+
+    .hero-art:hover .hero-book-3 {
+        transform: rotate(15deg) translateY(-4px);
+    }
+
+    .hero-note {
+        position: absolute;
+        bottom: 1.35rem;
+        left: 1.35rem;
+        z-index: 5;
+        display: flex;
+        align-items: center;
+        gap: 0.7rem;
+        padding: 0.62rem 0.9rem 0.62rem 0.62rem;
+        border: 1px solid rgba(22, 40, 32, 0.1);
+        border-radius: 14px;
+        color: var(--ink);
+        background: rgba(255, 252, 246, 0.93);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.18);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+    }
+
+    .hero-note-icon {
+        display: grid;
+        flex: 0 0 2.15rem;
+        width: 2.15rem;
+        height: 2.15rem;
+        place-items: center;
+        border-radius: 10px;
+        color: #fffaf2;
+        background: var(--clay);
+        font-size: 0.95rem;
+    }
+
+    .hero-note small,
+    .hero-note strong {
+        display: block;
+    }
+
+    .hero-note small {
+        color: var(--muted);
+        font-size: 0.58rem;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+    }
+
+    .hero-note strong {
+        margin-top: 0.1rem;
+        font-size: 0.78rem;
+        font-weight: 800;
+    }
+
+    /* ---------- Katalog bo'limi ---------- */
+    .catalog-section {
+        padding: 0 0 clamp(3.5rem, 7vw, 6rem);
+    }
+
+    .catalog-head {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 2rem;
+        margin-bottom: 2rem;
+        padding-top: 2.5rem;
+        border-top: 1px solid var(--line);
+    }
+
+    .section-kicker {
+        display: block;
+        margin-bottom: 0.7rem;
+        color: var(--clay-dark);
+        font-size: 0.68rem;
+        font-weight: 800;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+    }
+
+    .section-title {
+        margin: 0;
+        color: var(--ink);
+        font-family: var(--display);
+        font-size: clamp(2.2rem, 4vw, 3.5rem);
+        font-weight: 600;
+        letter-spacing: -0.045em;
+        line-height: 1;
+    }
+
+    .section-copy {
+        margin: 0.7rem 0 0;
+        color: var(--muted);
+        font-size: 0.88rem;
+        line-height: 1.65;
+    }
+
+    .sort-form {
+        flex: 0 0 auto;
+    }
+
+    .sort-label {
+        display: block;
+        margin-bottom: 0.4rem;
+        color: var(--muted);
+        font-size: 0.63rem;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+    }
+
+    .sort-select-wrap {
+        position: relative;
+    }
+
+    .sort-select-wrap select {
+        min-width: 190px;
+        padding: 0.72rem 2.5rem 0.72rem 1rem;
+        appearance: none;
+        -webkit-appearance: none;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        outline: 0;
+        color: var(--ink);
+        background: var(--paper-light);
+        font-size: 0.8rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .sort-select-wrap select:focus {
+        border-color: rgba(197, 111, 76, 0.65);
+        box-shadow: 0 0 0 4px rgba(197, 111, 76, 0.1);
+    }
+
+    .sort-select-wrap i {
+        position: absolute;
+        top: 50%;
+        right: 1rem;
+        color: var(--muted);
+        font-size: 0.75rem;
+        pointer-events: none;
+        transform: translateY(-50%);
+    }
+
+    .active-filter {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 1.75rem;
+        padding: 0.75rem 0.95rem 0.75rem 1rem;
+        border: 1px solid rgba(197, 111, 76, 0.2);
+        border-radius: 13px;
+        color: var(--ink-soft);
+        background: rgba(255, 252, 246, 0.62);
+        font-size: 0.81rem;
+    }
+
+    .active-filter span {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .active-filter i {
+        margin-right: 0.35rem;
+        color: var(--clay);
+    }
+
+    .active-filter a {
+        flex: 0 0 auto;
+        color: var(--clay-dark);
+        font-weight: 800;
+        text-decoration: none;
+    }
+
+    .active-filter a:hover {
+        color: var(--ink);
+    }
+
+    /* ---------- Kitob kartochkalari ---------- */
+    .book-tile {
+        position: relative;
         display: flex;
         flex-direction: column;
-        flex-grow: 1;
+        height: 100%;
+        padding: 0.6rem;
+        border: 1px solid rgba(22, 40, 32, 0.09);
+        border-radius: 21px;
+        background: rgba(255, 252, 246, 0.92);
+        box-shadow: 0 1px 2px rgba(22, 40, 32, 0.03);
+        transition: transform 0.32s ease, box-shadow 0.32s ease, border-color 0.32s ease;
+        animation: catalog-rise 0.65s cubic-bezier(0.2, 0.75, 0.25, 1) both;
+        animation-delay: calc(var(--i, 0) * 45ms);
     }
 
-    .genre-tag {
-        display: inline-block;
-        background: rgba(139, 92, 246, 0.15);
-        color: #c4b5fd;
-        font-size: 0.72rem;
-        font-weight: 700;
-        padding: 3px 10px;
-        border-radius: 999px;
-        border: 1px solid rgba(139, 92, 246, 0.2);
+    .book-tile:hover {
+        border-color: rgba(22, 40, 32, 0.17);
+        box-shadow: 0 24px 52px rgba(22, 40, 32, 0.13);
+        transform: translateY(-7px);
     }
 
-    .btn-accent {
-        background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
-        color: #fff;
-        border: none;
-        border-radius: 10px;
+    .book-tile-cover {
+        position: relative;
+        display: block;
+        overflow: hidden;
+        aspect-ratio: 3 / 4;
+        border-radius: 15px;
+        background: var(--paper-deep);
+    }
+
+    .book-tile-cover::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        box-shadow:
+            inset 7px 0 14px rgba(0, 0, 0, 0.11),
+            inset 0 0 0 1px rgba(22, 40, 32, 0.06);
+        pointer-events: none;
+    }
+
+    .book-tile-cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.55s cubic-bezier(0.2, 0.75, 0.25, 1);
+    }
+
+    .book-tile:hover .book-tile-cover img {
+        transform: scale(1.045);
+    }
+
+    .cover-index {
+        position: absolute;
+        top: 0.65rem;
+        left: 0.65rem;
+        z-index: 2;
+        display: grid;
+        width: 2rem;
+        height: 2rem;
+        place-items: center;
+        border: 1px solid rgba(255, 255, 255, 0.28);
+        border-radius: 50%;
+        color: #fffaf2;
+        background: rgba(15, 31, 24, 0.58);
+        font-size: 0.59rem;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        backdrop-filter: blur(9px);
+        -webkit-backdrop-filter: blur(9px);
+    }
+
+    .cover-fallback {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        color: rgba(255, 250, 242, 0.88);
+        background:
+            radial-gradient(circle at 20% 15%, rgba(255, 255, 255, 0.14), transparent 28%),
+            linear-gradient(145deg, #4e6d5b, #1d392c);
+    }
+
+    .cover-fallback span {
+        font-family: var(--display);
+        font-size: clamp(3.5rem, 7vw, 6rem);
         font-weight: 600;
-        font-size: 0.85rem;
-        padding: 0.45rem 0.9rem;
-        box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
-        text-decoration: none;
-        transition: opacity 0.2s, transform 0.2s;
+        letter-spacing: -0.08em;
     }
 
-    .btn-accent:hover {
-        color: #fff;
-        opacity: 0.9;
+    .cover-fallback i {
+        position: absolute;
+        right: 0.9rem;
+        bottom: 0.8rem;
+        color: rgba(255, 250, 242, 0.45);
+        font-size: 1.15rem;
+    }
+
+    .book-tile-body {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        padding: 0.9rem 0.45rem 0.35rem;
+    }
+
+    .tile-genre {
+        display: block;
+        max-width: 100%;
+        overflow: hidden;
+        color: var(--clay-dark);
+        font-size: 0.61rem;
+        font-weight: 800;
+        letter-spacing: 0.11em;
+        line-height: 1.4;
+        text-overflow: ellipsis;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+
+    .tile-title {
+        display: -webkit-box;
+        min-height: 2.35em;
+        margin: 0.42rem 0 0.2rem;
+        overflow: hidden;
+        color: var(--ink);
+        font-family: var(--display);
+        font-size: clamp(1.05rem, 1.45vw, 1.3rem);
+        font-weight: 600;
+        letter-spacing: -0.025em;
+        line-height: 1.16;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+    }
+
+    .tile-title a {
+        color: inherit;
+        text-decoration: none;
+    }
+
+    .tile-title a:hover {
+        color: var(--clay-dark);
+    }
+
+    .tile-author {
+        overflow: hidden;
+        margin: 0 0 0.9rem;
+        color: var(--muted);
+        font-size: 0.76rem;
+        line-height: 1.4;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .tile-bottom {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+        margin-top: auto;
+        padding-top: 0.78rem;
+        border-top: 1px solid var(--line);
+    }
+
+    .tile-price {
+        color: var(--ink);
+        font-size: 0.9rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        white-space: nowrap;
+    }
+
+    .tile-price span {
+        margin-left: 0.1rem;
+        color: var(--muted);
+        font-size: 0.66rem;
+        font-weight: 600;
+        letter-spacing: 0;
+    }
+
+    .tile-link {
+        display: grid;
+        flex: 0 0 2.2rem;
+        width: 2.2rem;
+        height: 2.2rem;
+        place-items: center;
+        border-radius: 50%;
+        color: #fffaf2;
+        background: var(--ink);
+        font-size: 0.85rem;
+        text-decoration: none;
+        transition: background 0.22s ease, transform 0.22s ease;
+    }
+
+    .tile-link:hover {
+        color: #fffaf2;
+        background: var(--clay);
+        transform: rotate(10deg);
+    }
+
+    /* ---------- Bo'sh holat ---------- */
+    .empty-catalog {
+        padding: clamp(3rem, 7vw, 5rem) 1.25rem;
+        border: 1px solid var(--line);
+        border-radius: 28px;
+        text-align: center;
+        background: rgba(255, 252, 246, 0.7);
+    }
+
+    .empty-icon {
+        display: grid;
+        width: 4.5rem;
+        height: 4.5rem;
+        margin: 0 auto 1.3rem;
+        place-items: center;
+        border: 1px solid rgba(197, 111, 76, 0.15);
+        border-radius: 50%;
+        color: var(--clay);
+        background: rgba(197, 111, 76, 0.1);
+        font-size: 1.65rem;
+    }
+
+    .empty-catalog h3 {
+        margin-bottom: 0.6rem;
+        color: var(--ink);
+        font-family: var(--display);
+        font-size: clamp(1.8rem, 3vw, 2.4rem);
+        font-weight: 600;
+        letter-spacing: -0.035em;
+    }
+
+    .empty-catalog p {
+        max-width: 420px;
+        margin: 0 auto 1.5rem;
+        color: var(--muted);
+        font-size: 0.88rem;
+        line-height: 1.7;
+    }
+
+    .btn-reset {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.1rem;
+        border-radius: 12px;
+        color: #fffaf2;
+        background: var(--ink);
+        font-size: 0.82rem;
+        font-weight: 700;
+        text-decoration: none;
+        transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    .btn-reset:hover {
+        color: #fffaf2;
+        background: var(--clay);
         transform: translateY(-2px);
+    }
+
+    /* ---------- Footer ---------- */
+    .public-footer {
+        position: relative;
+        overflow: hidden;
+        margin-top: 0;
+        padding: 3rem 0 1.75rem;
+        border-top: 0;
+        color: rgba(255, 250, 242, 0.62);
+        background: #13271f;
+    }
+
+    .public-footer::before {
+        content: "";
+        position: absolute;
+        top: -14rem;
+        right: -8rem;
+        width: 28rem;
+        height: 28rem;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(197, 111, 76, 0.24), transparent 68%);
+        pointer-events: none;
+    }
+
+    .public-footer .container {
+        position: relative;
+        z-index: 1;
+    }
+
+    .public-footer .brand {
+        color: #fffaf2;
+        font-family: var(--display);
+        font-size: 1.45rem;
+        letter-spacing: -0.035em;
+    }
+
+    .public-footer .brand i {
+        color: #db8d68;
+    }
+
+    .public-footer p {
+        color: rgba(255, 250, 242, 0.58);
+        font-size: 0.86rem;
+        line-height: 1.7;
+    }
+
+    .public-footer small {
+        color: rgba(255, 250, 242, 0.35);
+        border-top-color: rgba(255, 250, 242, 0.1);
+    }
+
+    @keyframes catalog-rise {
+        from {
+            opacity: 0;
+            transform: translateY(18px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @media (max-width: 991.98px) {
+        .catalog-hero {
+            padding-top: 3.25rem;
+        }
+
+        .hero-title {
+            font-size: clamp(3.3rem, 9vw, 5.2rem);
+        }
+
+        .hero-art {
+            min-height: 500px;
+            max-width: 640px;
+            margin: 0.5rem auto 0;
+        }
+    }
+
+    @media (max-width: 767.98px) {
+        .catalog-hero::before {
+            top: 4rem;
+            right: -2.5rem;
+            font-size: 42vw;
+        }
+
+        .hero-title {
+            font-size: clamp(3rem, 13vw, 4.5rem);
+        }
+
+        .hero-art {
+            min-height: clamp(430px, 72vw, 540px);
+            border-radius: 26px;
+        }
+
+        .catalog-head {
+            align-items: flex-start;
+            flex-direction: column;
+            gap: 1.4rem;
+        }
+
+        .sort-form,
+        .sort-select-wrap,
+        .sort-select-wrap select {
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 575.98px) {
+        .public-navbar {
+            padding: 0.72rem 0;
+        }
+
+        .public-navbar .brand {
+            font-size: 1.18rem;
+        }
+
+        .public-navbar .brand i {
+            font-size: 1.2rem !important;
+        }
+
+        .public-navbar .btn-admin-link {
+            padding: 0.45rem 0.7rem;
+            font-size: 0.76rem;
+        }
+
+        .catalog-hero {
+            padding: 2.2rem 0 3.2rem;
+        }
+
+        .hero-eyebrow {
+            margin-bottom: 1.1rem;
+            font-size: 0.62rem;
+        }
+
+        .hero-title {
+            font-size: clamp(2.8rem, 13.5vw, 3.9rem);
+        }
+
+        .hero-lead {
+            margin: 1.25rem 0 1.55rem;
+            font-size: 0.88rem;
+            line-height: 1.65;
+        }
+
+        .catalog-search {
+            padding-left: 0.9rem;
+            border-radius: 14px;
+        }
+
+        .catalog-search input {
+            padding: 0.68rem 0.55rem;
+            font-size: 0.84rem;
+        }
+
+        .catalog-search button {
+            padding: 0.72rem 0.85rem;
+            border-radius: 10px;
+            font-size: 0.76rem;
+        }
+
+        .hero-facts {
+            gap: 0.9rem;
+            margin-top: 1.4rem;
+        }
+
+        .hero-fact strong {
+            font-size: 1.2rem;
+        }
+
+        .hero-fact span {
+            font-size: 0.55rem;
+        }
+
+        .hero-fact-divider {
+            height: 1.9rem;
+        }
+
+        .hero-art {
+            min-height: clamp(345px, 75vw, 430px);
+            border-radius: 22px;
+        }
+
+        .hero-book {
+            border-width: 3px;
+            border-radius: 4px 8px 8px 4px;
+        }
+
+        .hero-book-1 {
+            top: 20%;
+            left: 4%;
+            width: 42%;
+        }
+
+        .hero-book-2 {
+            top: 8%;
+            left: 30%;
+            width: 47%;
+        }
+
+        .hero-book-3 {
+            top: 27%;
+            right: 1%;
+            width: 39%;
+        }
+
+        .hero-note {
+            bottom: 0.8rem;
+            left: 0.8rem;
+            padding: 0.5rem 0.7rem 0.5rem 0.5rem;
+        }
+
+        .hero-note-icon {
+            flex-basis: 1.8rem;
+            width: 1.8rem;
+            height: 1.8rem;
+            font-size: 0.8rem;
+        }
+
+        .hero-note small {
+            font-size: 0.5rem;
+        }
+
+        .hero-note strong {
+            font-size: 0.68rem;
+        }
+
+        .catalog-head {
+            padding-top: 1.8rem;
+        }
+
+        .section-title {
+            font-size: 2.25rem;
+        }
+
+        .section-copy {
+            font-size: 0.8rem;
+        }
+
+        .active-filter {
+            padding: 0.65rem 0.75rem;
+            font-size: 0.73rem;
+        }
+
+        .book-tile {
+            padding: 0.42rem;
+            border-radius: 17px;
+        }
+
+        .book-tile-cover {
+            border-radius: 12px;
+        }
+
+        .cover-index {
+            top: 0.45rem;
+            left: 0.45rem;
+            width: 1.65rem;
+            height: 1.65rem;
+            font-size: 0.5rem;
+        }
+
+        .book-tile-body {
+            padding: 0.7rem 0.3rem 0.25rem;
+        }
+
+        .tile-genre {
+            font-size: 0.52rem;
+        }
+
+        .tile-title {
+            min-height: 2.4em;
+            margin-top: 0.32rem;
+            font-size: 0.98rem;
+        }
+
+        .tile-author {
+            margin-bottom: 0.65rem;
+            font-size: 0.68rem;
+        }
+
+        .tile-bottom {
+            padding-top: 0.62rem;
+        }
+
+        .tile-price {
+            font-size: 0.79rem;
+        }
+
+        .tile-price span {
+            font-size: 0.55rem;
+        }
+
+        .tile-link {
+            flex-basis: 1.9rem;
+            width: 1.9rem;
+            height: 1.9rem;
+            font-size: 0.73rem;
+        }
+
+        .empty-catalog {
+            border-radius: 20px;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .book-tile {
+            animation: none;
+        }
+
+        .book-tile,
+        .book-tile-cover img,
+        .hero-book,
+        .tile-link,
+        .catalog-search button {
+            transition: none;
+        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<!-- Hero Section -->
-<div class="container hero-section text-center">
-    <div class="hero-badge">
-        <span class="dot"></span> Raqamli va bosma kutubxona
-    </div>
-    <h1 class="fw-bold display-5 mb-2 text-white">
-        Sevimli <span class="text-gradient">kitobingizni</span> toping
-    </h1>
-    <p class="mb-0" style="color: #9ca3af;">Jami {{ total_count }} ta kitob mavjud — o'zingizga yoqqanini tanlang</p>
-</div>
+<div class="catalog-page">
+    <!-- Hero -->
+    <section class="catalog-hero">
+        <div class="container">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6">
+                    <div class="hero-eyebrow">Bookify kutubxonasi</div>
+                    <h1 class="hero-title">
+                        Yangi <em>sahifa</em>,<br>
+                        yangi dunyo.
+                    </h1>
+                    <p class="hero-lead">
+                        O‘zingizga mos kitobni toping — falsafiy romanlardan tortib
+                        sarguzasht va tarixiy asarlargacha. Har bir sahifa yangi bir dunyoga eshik.
+                    </p>
 
-<!-- Mobil qidiruv -->
-<div class="container mb-4 d-md-none">
-    <form method="GET" action="{% url 'books_list' %}">
-        <div class="input-group rounded-pill overflow-hidden shadow-sm">
-            <span class="input-group-text dark-glass border-end-0"><i class="bi bi-search"></i></span>
-            <input type="text" name="q" class="form-control dark-glass border-start-0" placeholder="Kitob qidirish..." value="{{ query|default:'' }}">
-        </div>
-    </form>
-</div>
+                    <form method="GET" action="{% url 'books_list' %}" class="catalog-search" role="search">
+                        {% if sort %}<input type="hidden" name="sort" value="{{ sort }}">{% endif %}
+                        <i class="bi bi-search" aria-hidden="true"></i>
+                        <input type="search" name="q" placeholder="Kitob yoki muallifni qidiring..."
+                               value="{{ query|default:'' }}" aria-label="Kitob qidirish" autocomplete="off">
+                        <button type="submit">
+                            Qidirish
+                            <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                        </button>
+                    </form>
 
-<!-- Natijalar va Saralash -->
-<div class="container mb-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
-    <div class="text-muted small">
-        {% if query %}
-            "<strong>{{ query }}</strong>" bo'yicha {{ books|length }} ta natija
-        {% else %}
-            Barcha kitoblar
-        {% endif %}
-    </div>
-    <form method="GET" action="{% url 'books_list' %}" class="d-flex gap-2">
-        {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
-        <select name="sort" class="form-select form-select-sm dark-glass" onchange="this.form.submit()" style="width: auto;">
-            <option value="">Saralash...</option>
-            <option value="price_asc" {% if sort == "price_asc" %}selected{% endif %}>Narx (arzon)</option>
-            <option value="price_desc" {% if sort == "price_desc" %}selected{% endif %}>Narx (qimmat)</option>
-            <option value="title" {% if sort == "title" %}selected{% endif %}>Nomi (A-Z)</option>
-        </select>
-    </form>
-</div>
-
-<!-- Kitoblar Ro'yxati -->
-<div class="container pb-5">
-    <div class="row g-4">
-        {% for book in books %}
-        <div class="col-6 col-md-4 col-lg-3">
-            <div class="book-card">
-                <a href="{% url 'book_detail' book.id %}" class="cover text-decoration-none">
-                    {% if book.image %}
-                        <img src="{{ book.image.url }}" alt="{{ book.title }}">
-                    {% else %}
-                        <i class="bi bi-journal-bookmark fs-1 text-muted"></i>
-                    {% endif %}
-                </a>
-                <div class="body">
-                    {% if book.genre %}
-                        <div class="mb-2">
-                            <span class="genre-tag">{{ book.genre }}</span>
+                    <div class="hero-facts">
+                        <div class="hero-fact">
+                            <strong>{{ total_count }}</strong>
+                            <span>Katalogdagi kitob</span>
                         </div>
-                    {% endif %}
-                    <h6 class="text-truncate fw-bold mb-1">
-                        <a href="{% url 'book_detail' book.id %}" class="text-decoration-none text-white">{{ book.title }}</a>
-                    </h6>
-                    <div class="small mb-3" style="color: #9ca3af;">{{ book.author|default:"Noma'lum muallif" }}</div>
-                    
-                    <div class="mt-auto d-flex justify-content-between align-items-center">
-                        <span class="fw-bold text-white fs-6">{{ book.price }} so'm</span>
-                        <a href="{% url 'book_detail' book.id %}" class="btn-accent">Ko'rish</a>
+                        <div class="hero-fact-divider" aria-hidden="true"></div>
+                        <div class="hero-fact">
+                            <strong>24/7</strong>
+                            <span>Onlayn buyurtma</span>
+                        </div>
+                        <div class="hero-fact-divider" aria-hidden="true"></div>
+                        <div class="hero-fact">
+                            <strong>AI</strong>
+                            <span>Kitob yordamchisi</span>
+                        </div>
                     </div>
+                </div>
+
+                <div class="col-lg-6">
+                    {% with featured_books=books|slice:":3" %}
+                    <div class="hero-art hero-art-{{ featured_books|length }}" aria-hidden="true">
+                        {% for featured in featured_books %}
+                            <div class="hero-book hero-book-{{ forloop.counter }}">
+                                {% if featured.image %}
+                                    <img src="{{ featured.image.url }}" alt="">
+                                {% else %}
+                                    <span class="hero-book-cover-empty">{{ featured.title|first|upper }}</span>
+                                {% endif %}
+                            </div>
+                        {% empty %}
+                            <span class="hero-book hero-book-2">
+                                <span class="hero-book-cover-empty"><i class="bi bi-book-half"></i></span>
+                            </span>
+                        {% endfor %}
+
+                        <div class="hero-note">
+                            <span class="hero-note-icon"><i class="bi bi-stars"></i></span>
+                            <div>
+                                <small>Tanlangan nashrlar</small>
+                                <strong>O‘qishga arziydi</strong>
+                            </div>
+                        </div>
+                    </div>
+                    {% endwith %}
                 </div>
             </div>
         </div>
-        {% empty %}
-        <div class="col-12 text-center py-5">
-            <i class="bi bi-inbox fs-1 text-muted d-block mb-3"></i>
-            <h5 class="text-muted fw-bold">Hozircha kitob topilmadi</h5>
-            <p class="text-muted small">Qidiruv so'zini o'zgartirib ko'ring yoki keyinroq qayting.</p>
+    </section>
+
+    <!-- Katalog -->
+    <section class="catalog-section" id="katalog">
+        <div class="container">
+            <div class="catalog-head">
+                <div>
+                    <span class="section-kicker">Kolleksiya</span>
+                    <h2 class="section-title">
+                        {% if query %}Qidiruv natijalari{% else %}Barcha kitoblar{% endif %}
+                    </h2>
+                    <p class="section-copy">
+                        {% if query %}
+                            “{{ query }}” bo‘yicha {{ books|length }} ta natija topildi.
+                        {% else %}
+                            {{ total_count }} ta asar — har biri o‘z hikoyasi bilan.
+                        {% endif %}
+                    </p>
+                </div>
+
+                <form method="GET" action="{% url 'books_list' %}" class="sort-form">
+                    {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
+                    <label class="sort-label" for="catalog-sort">Saralash</label>
+                    <div class="sort-select-wrap">
+                        <select name="sort" id="catalog-sort" onchange="this.form.submit()">
+                            <option value="">Tavsiya etilgan</option>
+                            <option value="price_asc" {% if sort == "price_asc" %}selected{% endif %}>Narx: arzondan</option>
+                            <option value="price_desc" {% if sort == "price_desc" %}selected{% endif %}>Narx: qimmatdan</option>
+                            <option value="title" {% if sort == "title" %}selected{% endif %}>Nomi: A–Z</option>
+                        </select>
+                        <i class="bi bi-chevron-down" aria-hidden="true"></i>
+                    </div>
+                </form>
+            </div>
+
+            {% if query %}
+            <div class="active-filter">
+                <span><i class="bi bi-search"></i>“{{ query }}” bo‘yicha qidiruv</span>
+                <a href="{% url 'books_list' %}{% if sort %}?sort={{ sort }}{% endif %}">
+                    Tozalash <i class="bi bi-x-lg ms-1"></i>
+                </a>
+            </div>
+            {% endif %}
+
+            <div class="row g-3 g-md-4">
+                {% for book in books %}
+                <div class="col-6 col-md-4 col-xl-3">
+                    <article class="book-tile" style="--i: {{ forloop.counter0 }};">
+                        <a href="{% url 'book_detail' book.id %}" class="book-tile-cover"
+                           aria-label="{{ book.title }} kitobini ko‘rish">
+                            <span class="cover-index">{{ forloop.counter|stringformat:"02d" }}</span>
+                            {% if book.image %}
+                                <img src="{{ book.image.url }}" alt="{{ book.title }} muqovasi" loading="lazy">
+                            {% else %}
+                                <span class="cover-fallback">
+                                    <span>{{ book.title|first|upper }}</span>
+                                    <i class="bi bi-book"></i>
+                                </span>
+                            {% endif %}
+                        </a>
+
+                        <div class="book-tile-body">
+                            <span class="tile-genre">{{ book.genre|default:"Kitob" }}</span>
+                            <h3 class="tile-title">
+                                <a href="{% url 'book_detail' book.id %}">{{ book.title }}</a>
+                            </h3>
+                            <p class="tile-author">{{ book.author|default:"Noma’lum muallif" }}</p>
+
+                            <div class="tile-bottom">
+                                <div class="tile-price">
+                                    {{ book.price|floatformat:0 }} <span>so‘m</span>
+                                </div>
+                                <a href="{% url 'book_detail' book.id %}" class="tile-link"
+                                   aria-label="{{ book.title }} haqida batafsil">
+                                    <i class="bi bi-arrow-up-right" aria-hidden="true"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <div class="empty-catalog">
+                        <div class="empty-icon"><i class="bi bi-search"></i></div>
+                        <h3>Kitob topilmadi</h3>
+                        <p>
+                            Qidiruv so‘zini o‘zgartirib ko‘ring yoki katalogdagi
+                            barcha kitoblarni qaytadan ko‘ring.
+                        </p>
+                        <a href="{% url 'books_list' %}" class="btn-reset">
+                            <i class="bi bi-arrow-counterclockwise"></i>
+                            Barcha kitoblar
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
         </div>
-        {% endfor %}
-    </div>
+    </section>
 </div>
 {% endblock %}
